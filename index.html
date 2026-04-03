@@ -39,15 +39,12 @@
             justify-content: center;
             align-items: center;
             padding: 40px;
-            transition: opacity 1.2s ease;
+            transition: opacity 0.8s ease;
         }
 
-        .page.active { display: flex; animation: fadeIn 1.5s ease forwards; }
+        .page.active { display: flex; animation: fadeIn 1s ease forwards; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .aura-bg {
             position: fixed;
@@ -66,22 +63,25 @@
             background: radial-gradient(circle, var(--dynamic-color) 0%, transparent 70%);
             filter: blur(120px);
             opacity: 0.3;
-            transition: all 4s ease-in-out;
+            transition: all 3s ease-in-out;
         }
 
         #home-page h1 {
             font-family: var(--font-serif);
-            font-size: clamp(2.5rem, 8vw, 4rem);
-            letter-spacing: 1.2rem;
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            letter-spacing: 1.5rem;
             font-weight: 200;
             margin-bottom: 20px;
             text-align: center;
+            background: linear-gradient(to bottom, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         #home-page p {
-            opacity: 0.3;
-            letter-spacing: 0.5rem;
-            font-size: 0.8rem;
+            opacity: 0.4;
+            letter-spacing: 0.6rem;
+            font-size: 0.85rem;
             margin-bottom: 80px;
             text-align: center;
         }
@@ -89,12 +89,13 @@
         .scan-viewport {
             position: relative;
             width: 100%;
-            max-width: 450px;
-            aspect-ratio: 3/4;
+            max-width: 420px;
+            aspect-ratio: 1/1;
             background: #000;
             overflow: hidden;
-            border-radius: 2px;
-            box-shadow: 0 0 80px rgba(255,255,255,0.03);
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 0 100px rgba(255,255,255,0.05);
         }
 
         #webcam {
@@ -102,46 +103,28 @@
             height: 100%;
             object-fit: cover;
             transform: scaleX(-1);
-            filter: grayscale(1) contrast(0.9) brightness(1.1) blur(2px) sepia(0.2);
-            opacity: 0.7;
-            animation: inkBreathing 6s ease-in-out infinite;
-        }
-
-        @keyframes inkBreathing {
-            0%, 100% { filter: grayscale(1) contrast(0.8) blur(3px) sepia(0.2); opacity: 0.5; }
-            50% { filter: grayscale(1) contrast(1.1) blur(8px) sepia(0.3); opacity: 0.3; }
+            filter: grayscale(1) contrast(1.2) brightness(0.7);
+            opacity: 0.5;
         }
 
         .ink-overlay {
             position: absolute;
             inset: 0;
-            background: 
-                radial-gradient(circle at center, transparent 30%, #000 100%),
-                url('https://www.transparenttextures.com/patterns/pinstripe.png');
-            opacity: 0.6;
+            background: radial-gradient(circle at center, transparent 30%, #000 100%);
             pointer-events: none;
         }
 
         .scan-progress-box {
-            margin-top: 60px;
+            margin-top: 50px;
             text-align: center;
-            max-width: 300px;
         }
 
         .progress-text {
             font-family: var(--font-serif);
-            font-size: 0.85rem;
+            font-size: 1rem;
             letter-spacing: 8px;
-            opacity: 0.8;
-            margin-bottom: 20px;
-        }
-
-        .gesture-hint {
-            font-size: 0.65rem;
-            opacity: 0.3;
-            letter-spacing: 4px;
-            line-height: 2;
-            transition: opacity 0.5s;
+            opacity: 0.9;
+            margin-bottom: 15px;
         }
 
         .flash-overlay {
@@ -155,41 +138,39 @@
 
         .result-container {
             display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
+            grid-template-columns: 1.1fr 0.9fr;
             gap: 80px;
             max-width: 1200px;
             width: 100%;
+            align-items: center;
         }
 
         @media (max-width: 1000px) {
-            .result-container { grid-template-columns: 1fr; overflow-y: auto; gap: 40px; padding-bottom: 80px; }
-            .page { justify-content: flex-start; height: auto; padding: 20px;}
+            .result-container { grid-template-columns: 1fr; gap: 40px; height: 95vh; overflow-y: auto; padding-top: 40px; }
+            .art-box { order: 1; max-width: 500px; margin: 0 auto; }
+            .info-box { order: 2; text-align: center; padding-bottom: 60px; }
+            .btn { align-self: center !important; }
         }
 
         .art-box {
             width: 100%;
-            aspect-ratio: 4/5;
-            background: #0d0d0f;
+            aspect-ratio: 3/4;
+            background: #0a0a0c;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.03);
             overflow: hidden;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8);
         }
 
-        .art-box::before {
-            content: "";
+        .art-fallback-bg {
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle, var(--dynamic-color) 0%, transparent 80%);
+            background: radial-gradient(circle at 30% 30%, var(--dynamic-color), transparent);
             opacity: 0.2;
-            animation: pulse 4s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.1; transform: scale(1); }
-            50% { opacity: 0.3; transform: scale(1.1); }
+            display: none;
         }
 
         #art-img {
@@ -197,70 +178,53 @@
             height: 100%;
             object-fit: cover;
             display: none;
-            z-index: 5;
-            animation: imageReveal 3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2;
+            animation: artUnfold 2.5s cubic-bezier(0.2, 0, 0.2, 1);
         }
 
-        @keyframes imageReveal {
-            from { opacity: 0; filter: blur(30px) brightness(1.5); transform: scale(1.05); }
-            to { opacity: 1; filter: blur(0) brightness(1); transform: scale(1); }
+        @keyframes artUnfold {
+            0% { opacity: 0; filter: blur(30px) brightness(1.5); transform: scale(1.05); }
+            100% { opacity: 1; filter: blur(0) brightness(1); transform: scale(1); }
         }
 
-        .info-box {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .label {
-            font-size: 0.6rem;
-            letter-spacing: 5px;
-            opacity: 0.4;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .label::after { content: ""; height: 1px; flex: 1; background: rgba(255,255,255,0.08); }
-
-        #fortune-title { font-family: var(--font-serif); font-size: 3rem; margin: 0; font-weight: 300; }
-        #drink-name { font-family: var(--font-serif); font-size: 1.6rem; margin: 25px 0; font-weight: 300; opacity: 0.9; }
-        #reason { font-size: 0.9rem; line-height: 2.4; opacity: 0.5; text-align: justify; font-weight: 300; letter-spacing: 0.5px; }
+        #fortune-title { font-family: var(--font-serif); font-size: 3rem; margin: 0; font-weight: 300; letter-spacing: 0.5rem; }
+        #drink-name { font-family: var(--font-serif); font-size: 1.6rem; margin: 25px 0; font-weight: 300; opacity: 0.8; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; display: inline-block; }
+        #reason { font-size: 0.9rem; line-height: 2.5; opacity: 0.5; text-align: justify; font-weight: 300; letter-spacing: 0.05rem; }
 
         .btn {
             background: none;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
             color: #fff;
-            padding: 20px 50px;
-            font-size: 0.7rem;
-            letter-spacing: 6px;
-            text-transform: uppercase;
+            padding: 18px 45px;
+            font-size: 0.75rem;
+            letter-spacing: 5px;
             cursor: pointer;
-            transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-top: 50px;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-top: 40px;
+            text-transform: uppercase;
         }
 
-        .btn:hover { background: #fff; color: #000; border-color: #fff; }
+        .btn:hover { background: #fff; color: #000; border-color: #fff; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
 
-        .manifesting-circle {
+        .loading-wrap { display: flex; flex-direction: column; align-items: center; z-index: 10; position: absolute; }
+        .loading-ink {
             width: 40px;
             height: 40px;
             border: 1px solid rgba(255,255,255,0.05);
-            border-top-color: rgba(255,255,255,0.6);
+            border-top: 1px solid rgba(255,255,255,0.8);
             border-radius: 50%;
-            animation: spin 1.5s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
+            animation: rotateInk 1.5s linear infinite;
         }
+        @keyframes rotateInk { to { transform: rotate(360deg); } }
+        #loading-msg { margin-top: 20px; font-size: 0.65rem; letter-spacing: 3px; opacity: 0.5; font-family: var(--font-serif); }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        #art-loading-text {
-            margin-top: 20px;
+        .label {
             font-size: 0.6rem;
-            letter-spacing: 6px;
-            opacity: 0.4;
-            font-family: var(--font-serif);
+            letter-spacing: 4px;
+            opacity: 0.3;
+            margin-bottom: 15px;
+            display: block;
+            text-transform: uppercase;
         }
     </style>
 </head>
@@ -270,14 +234,14 @@
         <div class="aura-glow" id="bg-glow"></div>
     </div>
 
-    <!-- 1. 首页 -->
+    <!-- Page 1: Landing -->
     <div id="home-page" class="page active">
         <h1>灵犀感知</h1>
         <p>万物气韵 · 映照本心</p>
-        <button class="btn" onclick="goToScan()">开启感悟</button>
+        <button class="btn" onclick="startExperience()">开启仪式</button>
     </div>
 
-    <!-- 2. 识别页 -->
+    <!-- Page 2: Scanning -->
     <div id="scan-page" class="page">
         <div class="scan-viewport">
             <video id="webcam" autoplay playsinline></video>
@@ -285,27 +249,27 @@
             <div id="flash" class="flash-overlay"></div>
         </div>
         <div class="scan-progress-box">
-            <div class="progress-text" id="progress-val">等待缘起</div>
-            <div class="gesture-hint" id="gesture-hint">请面对镜头，双手合十<br>心诚则灵，感应即刻开启</div>
+            <div class="progress-text" id="status-text">请面对镜头，合十静心</div>
         </div>
     </div>
 
-    <!-- 3. 结果页 -->
+    <!-- Page 3: Result -->
     <div id="result-page" class="page">
         <div class="result-container">
-            <div class="art-box" id="art-box">
-                <div id="art-loading" style="text-align: center; z-index: 10;">
-                    <div class="manifesting-circle" style="margin: 0 auto;"></div>
-                    <div id="art-loading-text">画卷铺展中...</div>
+            <div class="art-box">
+                <div class="art-fallback-bg" id="fallback-bg"></div>
+                <div id="art-placeholder" class="loading-wrap">
+                    <div class="loading-ink"></div>
+                    <div id="loading-msg">正在研墨...</div>
                 </div>
-                <img id="art-img" alt="Gongbi Aesthetic Art">
+                <img id="art-img" alt="Zen Spirit Art">
             </div>
             <div class="info-box">
                 <span class="label">Soul Resonance // 鸣应</span>
-                <h2 id="fortune-title">---</h2>
-                <div id="drink-name">---</div>
-                <p id="reason">---</p>
-                <button class="btn" onclick="reset()" style="align-self: flex-start;">重寻宿命</button>
+                <h2 id="fortune-title">...</h2>
+                <div id="drink-name">...</div>
+                <p id="reason">...</p>
+                <button class="btn" onclick="reset()" style="align-self: flex-start;">再续前缘</button>
             </div>
         </div>
     </div>
@@ -314,168 +278,141 @@
 
     <script>
         const apiKey = ""; 
-        const pages = {
-            home: document.getElementById('home-page'),
-            scan: document.getElementById('scan-page'),
-            result: document.getElementById('result-page')
-        };
         const video = document.getElementById('webcam');
         const canvas = document.getElementById('capture-canvas');
-        const bgGlow = document.getElementById('bg-glow');
-        const progressVal = document.getElementById('progress-val');
-        const gestureHint = document.getElementById('gesture-hint');
-        const flash = document.getElementById('flash');
-        const artLoadingText = document.getElementById('art-loading-text');
+        
+        let isActive = false;
+        let detectionCounter = 0;
 
-        let isAnalyzing = false;
-
-        function showPage(pageId) {
-            Object.values(pages).forEach(p => p.classList.remove('active'));
-            pages[pageId].classList.add('active');
-        }
-
-        async function goToScan() {
-            showPage('scan');
-            isAnalyzing = false;
-            progressVal.innerText = "正在观照...";
-            gestureHint.style.opacity = "0.3";
+        async function startExperience() {
+            document.getElementById('home-page').classList.remove('active');
+            document.getElementById('scan-page').classList.add('active');
             
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { width: 1280, height: 720, facingMode: "user" } 
+                    video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } } 
                 });
                 video.srcObject = stream;
-                detectGestureLoop();
-            } catch (e) {
-                alert("感悟需要视觉接入。");
-                reset();
+                isActive = true;
+                detectLoop();
+            } catch (err) {
+                console.error("Camera access denied");
+                alert("请允许摄像头访问以继续体验");
             }
         }
 
-        async function detectGestureLoop() {
-            if (isAnalyzing) return;
+        // 优化检测循环：降低请求频率和图片大小
+        async function detectLoop() {
+            if (!isActive) return;
+
             const ctx = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0);
-            const base64 = canvas.toDataURL('image/jpeg', 0.5).split(',')[1];
+            canvas.width = 120; // 极小尺寸用于手势检测，提高速度
+            canvas.height = 90;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const base64 = canvas.toDataURL('image/jpeg', 0.4).split(',')[1];
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ 
-                            parts: [
-                                { text: "Is the person in the image joining their hands together in a prayer/greeting gesture (hands pressed together, palm to palm)? Respond ONLY with 'YES' or 'NO'." }, 
-                                { inlineData: { mimeType: "image/jpeg", data: base64 } }
-                            ] 
-                        }]
+                        contents: [{ parts: [
+                            { text: "Is the person's hands joined together (prayer/namaste)? Answer only YES or NO." },
+                            { inlineData: { mimeType: "image/jpeg", data: base64 } }
+                        ] }]
                     })
                 });
+                const data = await resp.json();
+                const result = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toUpperCase();
 
-                const result = await response.json();
-                const text = result.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toUpperCase();
-
-                if (text && text.includes("YES")) {
-                    triggerSuccess();
+                if (result && result.includes("YES")) {
+                    triggerAnalysis();
                 } else {
-                    setTimeout(detectGestureLoop, 2000);
+                    // 如果没检测到，稍微等待再继续，避免API配额消耗过快
+                    setTimeout(detectLoop, 1000);
                 }
             } catch (e) {
-                setTimeout(detectGestureLoop, 3000);
+                setTimeout(detectLoop, 2000);
             }
         }
 
-        async function triggerSuccess() {
-            isAnalyzing = true;
+        async function triggerAnalysis() {
+            isActive = false;
+            const flash = document.getElementById('flash');
             flash.style.opacity = "0.8";
-            progressVal.innerText = "灵犀已通";
-            gestureHint.innerText = "感应到赤诚之气，正在解读万象...";
-            gestureHint.style.opacity = "0.8";
+            setTimeout(() => flash.style.opacity = "0", 300);
+            document.getElementById('status-text').innerText = "感应中，请勿移动...";
 
-            setTimeout(() => {
-                flash.style.opacity = "0";
-                runAnalysis();
-            }, 600);
-        }
+            // 拍摄一张高质量照片用于后续分析
+            canvas.width = 640;
+            canvas.height = 480;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const qualityBase64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
 
-        function reset() {
-            if (video.srcObject) {
-                video.srcObject.getTracks().forEach(t => t.stop());
-                video.srcObject = null;
-            }
-            document.getElementById('art-img').style.display = 'none';
-            document.getElementById('art-loading').style.display = 'block';
-            artLoadingText.innerText = "画卷铺展中...";
-            showPage('home');
-        }
-
-        async function runAnalysis() {
-            const ctx = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0);
-            const base64 = canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
-
+            // 停止摄像头节省性能
             if (video.srcObject) {
                 video.srcObject.getTracks().forEach(t => t.stop());
             }
 
             try {
-                const prompt = `Based on the clothing color and facial energy, provide a drink recommendation. 
-                STRICT RULE: DO NOT mention "hands", "prayer", "gesture", "joining hands", or any description of the user's pose in the "reason" field. 
-                Focus purely on the spiritual vibe and the essence of the drink.
-                Return JSON in Chinese: {
-                    "fortuneTitle":"4-char Chinese idiom",
-                    "hexCode":"#HEX",
-                    "drinkName":"Exquisite drink name",
-                    "reason":"Chinese spiritual reason (purely about energy and drink, no pose talk)",
-                    "visualKeywords":"English gender, facial features, hair style"
-                }`;
-
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                const analysisPrompt = `
+                    Analyze the user's energy and color.
+                    Return JSON in Chinese: {
+                        "fortuneTitle": "4-char idiom",
+                        "hexCode": "matching color hex",
+                        "drinkName": "refined tea/drink",
+                        "drinkVisual": "cup style and liquid details",
+                        "reason": "poetic match description",
+                        "setting": "traditional scene description",
+                        "gender": "male or female",
+                        "clothing": "brief clothing description"
+                    }
+                `;
+                
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/jpeg", data: base64 } }] }],
+                        contents: [{ parts: [{ text: analysisPrompt }, { inlineData: { mimeType: "image/jpeg", data: qualityBase64 } }] }],
                         generationConfig: { responseMimeType: "application/json" }
                     })
                 });
-
-                const json = await response.json();
-                const data = JSON.parse(json.candidates[0].content.parts[0].text);
-                updateUI(data);
-                showPage('result');
                 
-                generateArt(base64, data);
-            } catch (e) {
-                console.error(e);
+                const jsonResp = await resp.json();
+                const data = JSON.parse(jsonResp.candidates[0].content.parts[0].text);
+
+                updateUI(data);
+                document.getElementById('scan-page').classList.remove('active');
+                document.getElementById('result-page').classList.add('active');
+
+                // 异步开始画图
+                generateArt(qualityBase64, data);
+
+            } catch (err) {
+                console.error(err);
                 reset();
             }
         }
 
-        async function generateArt(base64, data, retryCount = 0) {
-            const loadingMessages = [
-                "正在研墨...",
-                "起笔运势...",
-                "渲染山水...",
-                "画卷即将现世..."
-            ];
-            let msgIdx = 0;
-            const msgInterval = setInterval(() => {
-                artLoadingText.innerText = loadingMessages[msgIdx % loadingMessages.length];
-                msgIdx++;
-            }, 3000);
+        async function generateArt(base64, data) {
+            const msg = document.getElementById('loading-msg');
+            msg.innerText = "正在取意构图...";
+            
+            const artPrompt = `
+                Fine Gongbi ink painting style. Traditional Chinese art. Aged silk texture.
+                Portrait of a ${data.gender} in ancient scholar's robes (${data.hexCode}) based on ${data.clothing}.
+                The person is holding or admiring ${data.drinkName} in a ${data.drinkVisual}.
+                Background: ${data.setting}. 
+                Technique: Fine lines, elegant wash, soft mineral colors. Focus on tranquility and zen atmosphere.
+            `;
+
+            // 设置超时兜底逻辑
+            const timeoutId = setTimeout(() => {
+                if (document.getElementById('art-img').style.display !== 'block') {
+                    msg.innerText = "意境深远，图像尚在凝练中...";
+                }
+            }, 8000);
 
             try {
-                // 生图 Prompt 调整：姿态变更为拿着/品尝饮料，不再提及合掌
-                const artPrompt = `A high-quality Traditional Chinese Gongbi (meticulous style) painting on weathered silk texture. 
-                SUBJECT: A serene person (based on ${data.visualKeywords}) elegantly holding and DRINKING from a modern bubble tea cup with a straw. 
-                ATTIRE: Wearing sophisticated ${data.hexCode} traditional Chinese robes. 
-                SETTING: Sitting or standing in a peaceful primeval landscape with misty mountains and gnarled pines. 
-                STYLE: Fine ink lines, rich mineral pigment, antique sepia patina, poetic atmosphere. NO prayer gesture, focus on the joy of the drink.`;
-                
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -487,43 +424,45 @@
                     })
                 });
                 
+                clearTimeout(timeoutId);
                 const result = await response.json();
                 const genBase64 = result.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
                 
-                clearInterval(msgInterval);
                 if (genBase64) {
                     const img = document.getElementById('art-img');
                     img.src = `data:image/png;base64,${genBase64}`;
                     img.onload = () => {
                         img.style.display = "block";
-                        document.getElementById('art-loading').style.display = 'none';
+                        document.getElementById('art-placeholder').style.display = 'none';
                     };
                 } else {
-                    if (retryCount < 1) {
-                        artLoadingText.innerText = "再次挥毫...";
-                        setTimeout(() => generateArt(base64, data, retryCount + 1), 1000);
-                    } else {
-                        artLoadingText.innerText = "丹青难成，感悟已至";
-                    }
+                    throw new Error("No image generated");
                 }
             } catch (e) {
-                clearInterval(msgInterval);
-                if (retryCount < 1) {
-                    setTimeout(() => generateArt(base64, data, retryCount + 1), 1000);
-                } else {
-                    artLoadingText.innerText = "神思偶断，缘分已存";
-                }
+                msg.innerText = "丹青难落，已感其意";
+                document.getElementById('fallback-bg').style.display = 'block';
             }
         }
 
         function updateUI(data) {
             document.getElementById('fortune-title').innerText = data.fortuneTitle;
-            const drink = document.getElementById('drink-name');
-            drink.innerText = data.drinkName;
-            drink.style.color = data.hexCode;
+            const dn = document.getElementById('drink-name');
+            dn.innerText = data.drinkName;
+            dn.style.color = data.hexCode;
             document.getElementById('reason').innerText = data.reason;
-            bgGlow.style.background = `radial-gradient(circle, ${data.hexCode}22 0%, transparent 70%)`;
-            document.documentElement.style.setProperty('--dynamic-color', `${data.hexCode}33`);
+            document.getElementById('bg-glow').style.background = `radial-gradient(circle, ${data.hexCode}44 0%, transparent 70%)`;
+            document.documentElement.style.setProperty('--dynamic-color', `${data.hexCode}66`);
+            document.getElementById('fallback-bg').style.background = `radial-gradient(circle at 50% 50%, ${data.hexCode}22, transparent)`;
+        }
+
+        function reset() {
+            document.getElementById('result-page').classList.remove('active');
+            document.getElementById('home-page').classList.add('active');
+            document.getElementById('art-img').style.display = 'none';
+            document.getElementById('art-placeholder').style.display = 'flex';
+            document.getElementById('loading-msg').innerText = "正在研墨...";
+            document.getElementById('fallback-bg').style.display = 'none';
+            document.getElementById('status-text').innerText = "请面对镜头，合十静心";
         }
     </script>
 </body>
