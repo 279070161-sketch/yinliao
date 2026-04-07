@@ -3,25 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>灵犀感知 · 禅意视觉</title>
+    <title>靈犀感知 · 禪意視覺</title>
     <style>
         :root {
-            --primary-dark: #08080a;
+            --primary-dark: #050505;
             --accent: #ffffff;
-            --font-main: "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", sans-serif;
             --font-serif: "Noto Serif SC", "Songti SC", serif;
-            --dynamic-color: rgba(255, 255, 255, 0.1);
+            --theme-color: #ffffff;
         }
 
-        * {
-            box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-        }
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
 
         body {
             margin: 0;
             padding: 0;
-            font-family: var(--font-main);
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", sans-serif;
             background-color: var(--primary-dark);
             color: #fff;
             min-height: 100vh;
@@ -31,6 +27,54 @@
             overflow: hidden;
         }
 
+        /* 蜿蜒过渡层 */
+        #wave-transition {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+            background: #050505;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #wave-transition.active { opacity: 1; pointer-events: all; }
+
+        .wave-svg { position: absolute; width: 100%; height: 100%; top: 0; left: 0; }
+        .wave-path { fill: none; stroke-width: 1.5; stroke: rgba(255, 255, 255, 0.3); transition: all 1s ease; }
+
+        #wave-transition .ink-content { 
+            position: relative;
+            z-index: 1001;
+            color: #fff; 
+            font-family: var(--font-serif); 
+            font-size: 1.8rem; 
+            letter-spacing: 12px; 
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+            text-align: center;
+        }
+        #wave-transition.active .ink-content { opacity: 0.9; transform: translateY(0); }
+
+        .aura-bg { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 50% 50%, #111 0%, #000 100%); }
+        .glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70vw;
+            height: 70vw;
+            background: radial-gradient(circle, var(--theme-color) 0%, transparent 70%);
+            filter: blur(100px);
+            opacity: 0.05;
+            transition: all 4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
         .page {
             display: none;
             width: 100%;
@@ -38,431 +82,380 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 40px;
-            transition: opacity 0.8s ease;
+            padding: 20px;
         }
 
-        .page.active { display: flex; animation: fadeIn 1s ease forwards; }
+        .page.active { display: flex; animation: fadeIn 1.5s cubic-bezier(0.2, 0, 0.2, 1); }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .aura-bg {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            background: #000;
-        }
-
-        .aura-glow {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80vw;
-            height: 80vw;
-            background: radial-gradient(circle, var(--dynamic-color) 0%, transparent 70%);
-            filter: blur(120px);
-            opacity: 0.3;
-            transition: all 3s ease-in-out;
-        }
-
+        /* 首页样式 */
         #home-page h1 {
             font-family: var(--font-serif);
             font-size: clamp(2.5rem, 8vw, 4.5rem);
             letter-spacing: 1.5rem;
             font-weight: 200;
-            margin-bottom: 20px;
-            text-align: center;
-            background: linear-gradient(to bottom, #fff, #888);
+            margin-bottom: 1rem;
+            background: linear-gradient(to bottom, #fff, #777);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        #home-page p {
-            opacity: 0.4;
-            letter-spacing: 0.6rem;
-            font-size: 0.85rem;
-            margin-bottom: 80px;
-            text-align: center;
-        }
-
-        .scan-viewport {
+        /* 扫描容器 */
+        .scan-container {
             position: relative;
-            width: 100%;
-            max-width: 420px;
-            aspect-ratio: 1/1;
-            background: #000;
-            overflow: hidden;
+            width: 320px;
+            height: 320px;
             border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.15);
-            box-shadow: 0 0 100px rgba(255,255,255,0.05);
+            border: 1px dashed rgba(255,255,255,0.1);
+            overflow: hidden;
+            box-shadow: 0 0 80px rgba(255,255,255,0.02);
         }
+        .scan-container.success { transform: scale(0.9); filter: blur(20px) brightness(0.3); opacity: 0; transition: all 1s; }
+        #webcam { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); filter: grayscale(1) brightness(0.7); }
 
-        #webcam {
+        /* 结果页布局 */
+        .result-grid {
+            display: flex;
+            flex-direction: row;
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scaleX(-1);
-            filter: grayscale(1) contrast(1.2) brightness(0.7);
-            opacity: 0.5;
-        }
-
-        .ink-overlay {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at center, transparent 30%, #000 100%);
-            pointer-events: none;
-        }
-
-        .scan-progress-box {
-            margin-top: 50px;
-            text-align: center;
-        }
-
-        .progress-text {
-            font-family: var(--font-serif);
-            font-size: 1rem;
-            letter-spacing: 8px;
-            opacity: 0.9;
-            margin-bottom: 15px;
-        }
-
-        .flash-overlay {
-            position: absolute;
-            inset: 0;
-            background: #fff;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 100;
-        }
-
-        .result-container {
-            display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
-            gap: 80px;
-            max-width: 1200px;
-            width: 100%;
+            max-width: 1100px;
+            gap: 60px;
             align-items: center;
+            justify-content: center;
         }
 
-        @media (max-width: 1000px) {
-            .result-container { grid-template-columns: 1fr; gap: 40px; height: 95vh; overflow-y: auto; padding-top: 40px; }
-            .art-box { order: 1; max-width: 500px; margin: 0 auto; }
-            .info-box { order: 2; text-align: center; padding-bottom: 60px; }
-            .btn { align-self: center !important; }
-        }
-
-        .art-box {
-            width: 100%;
-            aspect-ratio: 3/4;
-            background: #0a0a0c;
+        .art-frame {
+            flex: 0 0 380px;
             position: relative;
+            aspect-ratio: 3/4;
+            background: #0a0a0a;
+            border: 1px solid rgba(255,255,255,0.05);
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(255,255,255,0.03);
             overflow: hidden;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            cursor: pointer;
         }
 
-        .art-fallback-bg {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 30% 30%, var(--dynamic-color), transparent);
-            opacity: 0.2;
-            display: none;
+        #art-img { width: 100%; height: 100%; object-fit: cover; display: none; }
+        .art-unfold-anim { animation: artUnfold 4s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
+
+        .info-panel {
+            flex: 1;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
         }
 
-        #art-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-            z-index: 2;
-            animation: artUnfold 2.5s cubic-bezier(0.2, 0, 0.2, 1);
-        }
+        #res-title { font-family: var(--font-serif); font-size: 2.8rem; letter-spacing: 0.8rem; margin: 0 0 10px; font-weight: 200; color: #fff; }
+        #res-drink { font-family: var(--font-serif); font-size: 1.5rem; margin-bottom: 30px; font-weight: 300; display: inline-block; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; }
+        
+        .content-section { margin-bottom: 25px; }
+        .section-label { font-size: 0.65rem; color: rgba(255,255,255,0.3); letter-spacing: 3px; margin-bottom: 10px; display: block; font-family: var(--font-serif); }
+        .section-text { font-size: 0.95rem; line-height: 1.8; color: rgba(255,255,255,0.75); text-align: justify; }
 
-        @keyframes artUnfold {
-            0% { opacity: 0; filter: blur(30px) brightness(1.5); transform: scale(1.05); }
-            100% { opacity: 1; filter: blur(0) brightness(1); transform: scale(1); }
-        }
+        .button-group { display: flex; gap: 15px; margin-top: 30px; position: relative; z-index: 10; }
 
-        #fortune-title { font-family: var(--font-serif); font-size: 3rem; margin: 0; font-weight: 300; letter-spacing: 0.5rem; }
-        #drink-name { font-family: var(--font-serif); font-size: 1.6rem; margin: 25px 0; font-weight: 300; opacity: 0.8; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; display: inline-block; }
-        #reason { font-size: 0.9rem; line-height: 2.5; opacity: 0.5; text-align: justify; font-weight: 300; letter-spacing: 0.05rem; }
+        /* 移动端适配 */
+        @media (max-width: 850px) {
+            .page { height: auto; min-height: 100vh; padding: 60px 20px; overflow-y: auto; }
+            .result-grid { flex-direction: column; align-items: center; gap: 40px; }
+            .art-frame { flex: 0 0 auto; width: 100%; max-width: 340px; }
+            .info-panel { text-align: center; align-items: center; }
+            .section-text { text-align: center; }
+            .button-group { width: 100%; justify-content: center; flex-wrap: wrap; }
+        }
 
         .btn {
             background: none;
             border: 1px solid rgba(255,255,255,0.15);
-            color: #fff;
-            padding: 18px 45px;
-            font-size: 0.75rem;
-            letter-spacing: 5px;
-            cursor: pointer;
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-top: 40px;
-            text-transform: uppercase;
-        }
-
-        .btn:hover { background: #fff; color: #000; border-color: #fff; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
-
-        .loading-wrap { display: flex; flex-direction: column; align-items: center; z-index: 10; position: absolute; }
-        .loading-ink {
-            width: 40px;
-            height: 40px;
-            border: 1px solid rgba(255,255,255,0.05);
-            border-top: 1px solid rgba(255,255,255,0.8);
-            border-radius: 50%;
-            animation: rotateInk 1.5s linear infinite;
-        }
-        @keyframes rotateInk { to { transform: rotate(360deg); } }
-        #loading-msg { margin-top: 20px; font-size: 0.65rem; letter-spacing: 3px; opacity: 0.5; font-family: var(--font-serif); }
-
-        .label {
-            font-size: 0.6rem;
+            color: rgba(255,255,255,0.7);
+            padding: 12px 28px;
+            font-size: 0.7rem;
             letter-spacing: 4px;
-            opacity: 0.3;
-            margin-bottom: 15px;
-            display: block;
-            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.5s;
+            white-space: nowrap;
         }
+        .btn:hover { color: #fff; border-color: #fff; background: rgba(255,255,255,0.05); }
+        .btn-primary { border-color: rgba(255,255,255,0.4); color: #fff; }
+
+        /* 预览层 */
+        #download-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.98);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        #download-overlay.active { display: flex; }
+        #preview-img { max-width: 100%; max-height: 75vh; box-shadow: 0 0 50px rgba(0,0,0,1); border: 1px solid rgba(255,255,255,0.1); }
+        .download-hint { margin-top: 25px; font-family: var(--font-serif); font-size: 0.85rem; color: #888; letter-spacing: 4px; }
+
+        /* 动画 */
+        .loading-state { text-align: center; }
+        .ripple-container { width: 80px; height: 80px; position: relative; margin: 0 auto 20px; display: flex; justify-content: center; align-items: center; }
+        .ripple { position: absolute; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%; animation: ripple-anim 3s infinite; }
+        @keyframes ripple-anim { 0% { width: 0; height: 0; opacity: 1; } 100% { width: 100px; height: 100px; opacity: 0; } }
+        @keyframes artUnfold { from { opacity: 0; filter: blur(20px); transform: scale(1.05); } to { opacity: 1; filter: blur(0); transform: scale(1); } }
+
+        #audio-toggle { position: fixed; bottom: 25px; right: 25px; z-index: 100; background: none; border: none; color: rgba(255,255,255,0.2); font-size: 0.6rem; letter-spacing: 2px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="aura-bg">
-        <div class="aura-glow" id="bg-glow"></div>
+    <div class="aura-bg"><div class="glow" id="main-glow"></div></div>
+    
+    <div id="download-overlay" onclick="this.classList.remove('active')">
+        <img id="preview-img" src="" alt="靈犀藝術">
+        <p class="download-hint">長按圖片保存至相冊</p>
+        <button class="btn" style="margin-top: 30px;">關閉預覽</button>
     </div>
 
-    <!-- Page 1: Landing -->
+    <div id="wave-transition">
+        <svg class="wave-svg" id="wave-canvas"></svg>
+        <div class="ink-content">
+            靈犀微動
+            <div style="font-size: 0.7rem; letter-spacing: 6px; opacity: 0.5; margin-top: 15px;">心之所向 · 見此本心</div>
+        </div>
+    </div>
+
     <div id="home-page" class="page active">
-        <h1>灵犀感知</h1>
-        <p>万物气韵 · 映照本心</p>
-        <button class="btn" onclick="startExperience()">开启仪式</button>
+        <h1>靈犀感知</h1>
+        <p style="letter-spacing: 8px; opacity: 0.3; font-size: 0.8rem; font-family: var(--font-serif); margin-bottom: 40px;">尋芳覓影 · 此時此刻</p>
+        <button class="btn btn-primary" onclick="initExperience()">開啟感知</button>
     </div>
 
-    <!-- Page 2: Scanning -->
     <div id="scan-page" class="page">
-        <div class="scan-viewport">
+        <div class="scan-container" id="scan-box">
             <video id="webcam" autoplay playsinline></video>
-            <div class="ink-overlay"></div>
-            <div id="flash" class="flash-overlay"></div>
+            <div style="position:absolute; inset:0; background:radial-gradient(circle, transparent 40%, #000 120%); display:flex; align-items:center; justify-content:center;">
+                <div style="font-family:var(--font-serif); font-size:0.9rem; letter-spacing:4px; color:rgba(255,255,255,0.6); animation: pulse 2s infinite;">請雙手合十</div>
+            </div>
         </div>
-        <div class="scan-progress-box">
-            <div class="progress-text" id="status-text">请面对镜头，合十静心</div>
-        </div>
+        <p style="margin-top:40px; font-size:0.7rem; opacity:0.3; letter-spacing:4px; font-family:var(--font-serif);">靜候緣起，開啟覺知...</p>
     </div>
 
-    <!-- Page 3: Result -->
     <div id="result-page" class="page">
-        <div class="result-container">
-            <div class="art-box">
-                <div class="art-fallback-bg" id="fallback-bg"></div>
-                <div id="art-placeholder" class="loading-wrap">
-                    <div class="loading-ink"></div>
-                    <div id="loading-msg">正在研墨...</div>
+        <div class="result-grid">
+            <div class="art-frame" onclick="showPreview()">
+                <div id="art-loader" class="loading-state">
+                    <div class="ripple-container">
+                        <div class="ripple"></div>
+                        <div class="ripple" style="animation-delay:1s"></div>
+                    </div>
+                    <div style="font-size: 0.65rem; opacity: 0.4; letter-spacing: 3px; font-family: var(--font-serif);">正在照見本心</div>
                 </div>
-                <img id="art-img" alt="Zen Spirit Art">
+                <img id="art-img">
             </div>
-            <div class="info-box">
-                <span class="label">Soul Resonance // 鸣应</span>
-                <h2 id="fortune-title">...</h2>
-                <div id="drink-name">...</div>
-                <p id="reason">...</p>
-                <button class="btn" onclick="reset()" style="align-self: flex-start;">再续前缘</button>
+            <div class="info-panel">
+                <span style="font-size:0.6rem; letter-spacing:4px; color:rgba(255,255,255,0.4); margin-bottom:10px; display:block;">CELESTIAL ECHO // 鳴應</span>
+                <h2 id="res-title">正在感悟</h2>
+                <div id="res-drink">...</div>
+                
+                <div class="content-section">
+                    <span class="section-label">【 氣韻分析 】</span>
+                    <p id="res-aura" class="section-text">正在感悟...</p>
+                </div>
+
+                <div class="content-section">
+                    <span class="section-label">【 薦飲之由 】</span>
+                    <p id="res-reason" class="section-text">正在尋味...</p>
+                </div>
+
+                <div class="button-group">
+                    <!-- 确保查看大图按钮 ID 正确且在生成后显示 -->
+                    <button id="view-full-btn" class="btn btn-primary" onclick="showPreview()" style="display:none;">查看全圖</button>
+                    <button class="btn" onclick="location.reload()">再續前緣</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <canvas id="capture-canvas" style="display:none;"></canvas>
+    <button id="audio-toggle" onclick="toggleAudio()">AUDIO / ON</button>
+    <canvas id="hidden-canvas" style="display:none;"></canvas>
 
     <script>
         const apiKey = ""; 
-        const video = document.getElementById('webcam');
-        const canvas = document.getElementById('capture-canvas');
+        const v = document.getElementById('webcam');
+        const c = document.getElementById('hidden-canvas');
+        const waveTrans = document.getElementById('wave-transition');
+        const waveSvg = document.getElementById('wave-canvas');
         
-        let isActive = false;
-        let detectionCounter = 0;
+        let isScanning = false, isMuted = false, currentArtB64 = "";
 
-        async function startExperience() {
-            document.getElementById('home-page').classList.remove('active');
-            document.getElementById('scan-page').classList.add('active');
-            
+        async function speak(text) {
+            if (isMuted) return;
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } } 
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: `以極具禪意、優雅且緩慢的語氣朗讀這段話：${text}` }] }],
+                        generationConfig: { 
+                            responseModalities: ["AUDIO"],
+                            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Charon" } } } 
+                        },
+                        model: "gemini-2.5-flash-preview-tts"
+                    })
                 });
-                video.srcObject = stream;
-                isActive = true;
-                detectLoop();
-            } catch (err) {
-                console.error("Camera access denied");
-                alert("请允许摄像头访问以继续体验");
-            }
+                const result = await response.json();
+                const pcmData = result.candidates[0].content.parts[0].inlineData.data;
+                const audio = new Audio(URL.createObjectURL(new Blob([createWavHeader(pcmData.length, 24000), Uint8Array.from(atob(pcmData), char => char.charCodeAt(0)).buffer], { type: 'audio/wav' })));
+                audio.play();
+            } catch (e) {}
         }
 
-        // 优化检测循环：降低请求频率和图片大小
-        async function detectLoop() {
-            if (!isActive) return;
+        function createWavHeader(l, r) {
+            const b = new ArrayBuffer(44), v = new DataView(b);
+            v.setUint32(0, 0x46464952, true); v.setUint32(4, 36 + l, true); v.setUint32(8, 0x45564157, true);
+            v.setUint32(12, 0x20746d66, true); v.setUint32(16, 16, true); v.setUint16(20, 1, true);
+            v.setUint16(22, 1, true); v.setUint32(24, r, true); v.setUint32(28, r * 2, true);
+            v.setUint16(32, 2, true); v.setUint16(34, 16, true); v.setUint32(36, 0x61746164, true); v.setUint32(40, l, true);
+            return b;
+        }
 
-            const ctx = canvas.getContext('2d');
-            canvas.width = 120; // 极小尺寸用于手势检测，提高速度
-            canvas.height = 90;
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const base64 = canvas.toDataURL('image/jpeg', 0.4).split(',')[1];
+        function initExperience() {
+            speak("閉上眼，深呼吸。當你心神安定時，雙手合十，讓我照見你的氣場。");
+            document.getElementById('home-page').classList.remove('active');
+            document.getElementById('scan-page').classList.add('active');
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then(s => { v.srcObject = s; isScanning = true; requestAnimationFrame(detectionLoop); });
+        }
+
+        let lastDetect = 0;
+        async function detectionLoop(now) {
+            if (!isScanning) return;
+            if (now - lastDetect > 1500) {
+                lastDetect = now;
+                const ctx = c.getContext('2d'); c.width = 120; c.height = 90;
+                ctx.drawImage(v, 0, 0, 120, 90);
+                const b64 = c.toDataURL('image/jpeg', 0.4).split(',')[1];
+                try {
+                    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        body: JSON.stringify({ contents: [{ parts: [{ text: "图中人是否正在做合十礼（双手合掌）？只需回答 YES 或 NO。" }, { inlineData: { mimeType: "image/jpeg", data: b64 } }] }] })
+                    });
+                    const d = await resp.json();
+                    if (d.candidates?.[0]?.content?.parts?.[0]?.text?.toUpperCase().includes('YES')) {
+                        isScanning = false;
+                        document.getElementById('scan-box').classList.add('success');
+                        setTimeout(() => { waveTrans.classList.add('active'); setTimeout(processAnalysis, 2000); }, 300);
+                        return;
+                    }
+                } catch (e) {}
+            }
+            requestAnimationFrame(detectionLoop);
+        }
+
+        async function processAnalysis() {
+            c.width = 640; c.height = 480; c.getContext('2d').drawImage(v, 0, 0);
+            const highRes = c.toDataURL('image/jpeg', 0.8).split(',')[1];
+            if (v.srcObject) v.srcObject.getTracks().forEach(t => t.stop());
 
             try {
-                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     body: JSON.stringify({
                         contents: [{ parts: [
-                            { text: "Is the person's hands joined together (prayer/namaste)? Answer only YES or NO." },
-                            { inlineData: { mimeType: "image/jpeg", data: base64 } }
-                        ] }]
-                    })
-                });
-                const data = await resp.json();
-                const result = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toUpperCase();
-
-                if (result && result.includes("YES")) {
-                    triggerAnalysis();
-                } else {
-                    // 如果没检测到，稍微等待再继续，避免API配额消耗过快
-                    setTimeout(detectLoop, 1000);
-                }
-            } catch (e) {
-                setTimeout(detectLoop, 2000);
-            }
-        }
-
-        async function triggerAnalysis() {
-            isActive = false;
-            const flash = document.getElementById('flash');
-            flash.style.opacity = "0.8";
-            setTimeout(() => flash.style.opacity = "0", 300);
-            document.getElementById('status-text').innerText = "感应中，请勿移动...";
-
-            // 拍摄一张高质量照片用于后续分析
-            canvas.width = 640;
-            canvas.height = 480;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            const qualityBase64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
-
-            // 停止摄像头节省性能
-            if (video.srcObject) {
-                video.srcObject.getTracks().forEach(t => t.stop());
-            }
-
-            try {
-                const analysisPrompt = `
-                    Analyze the user's energy and color.
-                    Return JSON in Chinese: {
-                        "fortuneTitle": "4-char idiom",
-                        "hexCode": "matching color hex",
-                        "drinkName": "refined tea/drink",
-                        "drinkVisual": "cup style and liquid details",
-                        "reason": "poetic match description",
-                        "setting": "traditional scene description",
-                        "gender": "male or female",
-                        "clothing": "brief clothing description"
-                    }
-                `;
-                
-                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: analysisPrompt }, { inlineData: { mimeType: "image/jpeg", data: qualityBase64 } }] }],
+                            { text: "请作为一名禅修大师，分析图中人物的能量场。请严格返回 JSON 格式：{ \"fortuneTitle\": \"四字气韵标题\", \"drinkName\": \"推荐饮品名称\", \"hexColor\": \"契合气场的颜色十六进制码\", \"auraAnalysis\": \"富有诗意的气韵分析（中文）\", \"recommendationReason\": \"推荐此饮品的深层心灵理由（中文）\", \"gender\": \"图中人物性别(男/女)\" }" },
+                            { inlineData: { mimeType: "image/jpeg", data: highRes } }
+                        ] }],
                         generationConfig: { responseMimeType: "application/json" }
                     })
                 });
-                
-                const jsonResp = await resp.json();
-                const data = JSON.parse(jsonResp.candidates[0].content.parts[0].text);
 
-                updateUI(data);
+                const data = JSON.parse((await res.json()).candidates[0].content.parts[0].text);
+                document.getElementById('res-title').innerText = data.fortuneTitle;
+                document.getElementById('res-drink').innerText = data.drinkName;
+                document.getElementById('res-drink').style.color = data.hexColor;
+                document.getElementById('res-aura').innerText = data.auraAnalysis;
+                document.getElementById('res-reason').innerText = data.recommendationReason;
+                document.getElementById('main-glow').style.background = `radial-gradient(circle, ${data.hexColor}33 0%, transparent 70%)`;
+
                 document.getElementById('scan-page').classList.remove('active');
                 document.getElementById('result-page').classList.add('active');
-
-                // 异步开始画图
-                generateArt(qualityBase64, data);
-
-            } catch (err) {
-                console.error(err);
-                reset();
-            }
+                setTimeout(() => { waveTrans.classList.remove('active'); }, 1000);
+                
+                speak(`緣分已至。${data.fortuneTitle}。${data.auraAnalysis}。為你薦飲 ${data.drinkName}，因為 ${data.recommendationReason}`);
+                
+                // 开始生成图片
+                generateArt(highRes, data);
+            } catch (e) { location.reload(); }
         }
 
-        async function generateArt(base64, data) {
-            const msg = document.getElementById('loading-msg');
-            msg.innerText = "正在取意构图...";
-            
-            const artPrompt = `
-                Fine Gongbi ink painting style. Traditional Chinese art. Aged silk texture.
-                Portrait of a ${data.gender} in ancient scholar's robes (${data.hexCode}) based on ${data.clothing}.
-                The person is holding or admiring ${data.drinkName} in a ${data.drinkVisual}.
-                Background: ${data.setting}. 
-                Technique: Fine lines, elegant wash, soft mineral colors. Focus on tranquility and zen atmosphere.
-            `;
-
-            // 设置超时兜底逻辑
-            const timeoutId = setTimeout(() => {
-                if (document.getElementById('art-img').style.display !== 'block') {
-                    msg.innerText = "意境深远，图像尚在凝练中...";
-                }
-            }, 8000);
-
+        async function generateArt(b64, d) {
+            const prompt = `一幅高水准的中国工笔画风格艺术作品。画面中心是一个${d.gender === '男' ? '儒雅的男子' : '温婉的女子'}正端着一杯现代感十足的${d.drinkName}。背景为留白的禅意园林景观，烟雾缭绕。色调以${d.hexColor}为主。绢本质感，线条细腻，意境深远。`;
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{
-                            parts: [ { text: artPrompt }, { inlineData: { mimeType: "image/jpeg", data: base64 } } ]
-                        }],
+                        contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/jpeg", data: b64 } }] }],
                         generationConfig: { responseModalities: ['TEXT', 'IMAGE'] }
                     })
                 });
+                const resJson = await response.json();
+                const imgData = resJson.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
                 
-                clearTimeout(timeoutId);
-                const result = await response.json();
-                const genBase64 = result.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
-                
-                if (genBase64) {
-                    const img = document.getElementById('art-img');
-                    img.src = `data:image/png;base64,${genBase64}`;
-                    img.onload = () => {
-                        img.style.display = "block";
-                        document.getElementById('art-placeholder').style.display = 'none';
+                if (imgData) {
+                    currentArtB64 = `data:image/png;base64,${imgData}`;
+                    const artImg = document.getElementById('art-img');
+                    const previewImg = document.getElementById('preview-img');
+                    const viewBtn = document.getElementById('view-full-btn');
+                    const loader = document.getElementById('art-loader');
+
+                    artImg.src = currentArtB64;
+                    previewImg.src = currentArtB64;
+                    
+                    artImg.onload = () => {
+                        loader.style.display = 'none';
+                        artImg.style.display = 'block';
+                        artImg.classList.add('art-unfold-anim');
+                        // 显式显示查看全图按钮
+                        viewBtn.style.display = 'inline-block';
                     };
-                } else {
-                    throw new Error("No image generated");
                 }
             } catch (e) {
-                msg.innerText = "丹青难落，已感其意";
-                document.getElementById('fallback-bg').style.display = 'block';
+                console.error("生成艺术画失败", e);
             }
         }
 
-        function updateUI(data) {
-            document.getElementById('fortune-title').innerText = data.fortuneTitle;
-            const dn = document.getElementById('drink-name');
-            dn.innerText = data.drinkName;
-            dn.style.color = data.hexCode;
-            document.getElementById('reason').innerText = data.reason;
-            document.getElementById('bg-glow').style.background = `radial-gradient(circle, ${data.hexCode}44 0%, transparent 70%)`;
-            document.documentElement.style.setProperty('--dynamic-color', `${data.hexCode}66`);
-            document.getElementById('fallback-bg').style.background = `radial-gradient(circle at 50% 50%, ${data.hexCode}22, transparent)`;
+        function showPreview() {
+            if (currentArtB64) {
+                document.getElementById('download-overlay').classList.add('active');
+            }
         }
 
-        function reset() {
-            document.getElementById('result-page').classList.remove('active');
-            document.getElementById('home-page').classList.add('active');
-            document.getElementById('art-img').style.display = 'none';
-            document.getElementById('art-placeholder').style.display = 'flex';
-            document.getElementById('loading-msg').innerText = "正在研墨...";
-            document.getElementById('fallback-bg').style.display = 'none';
-            document.getElementById('status-text').innerText = "请面对镜头，合十静心";
+        // 背景动态线条
+        const lines = [];
+        for (let i = 0; i < 12; i++) {
+            const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            p.classList.add("wave-path"); waveSvg.appendChild(p);
+            lines.push({ el: p, off: Math.random() * 500, y: (window.innerHeight / 12) * i });
+        }
+
+        function draw() {
+            const w = window.innerWidth, h = window.innerHeight;
+            waveSvg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+            lines.forEach(l => {
+                let d = `M -50 ${l.y}`;
+                for (let x = -50; x <= w + 50; x += 50) d += ` L ${x} ${l.y + Math.sin(x * 0.002 + l.off) * 60}`;
+                l.el.setAttribute("d", d);
+                l.off += 0.015;
+            });
+            requestAnimationFrame(draw);
+        }
+        draw();
+
+        function toggleAudio() {
+            isMuted = !isMuted;
+            document.getElementById('audio-toggle').innerText = isMuted ? "AUDIO / OFF" : "AUDIO / ON";
         }
     </script>
 </body>
