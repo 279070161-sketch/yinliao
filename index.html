@@ -6,7 +6,7 @@
     <title>灵犀感知 · 禅意视觉</title>
     <style>
         :root {
-            --primary-dark: #08080a;
+            --primary-dark: #050505;
             --accent: #ffffff;
             --font-main: "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", sans-serif;
             --font-serif: "Noto Serif SC", "Songti SC", serif;
@@ -16,6 +16,7 @@
         * {
             box-sizing: border-box;
             -webkit-font-smoothing: antialiased;
+            cursor: none; /* 禁用默认光标 */
         }
 
         body {
@@ -31,15 +32,46 @@
             overflow: hidden;
         }
 
-        /* 增加全局纸张纹理 */
-        body::after {
+        /* 画廊式全局边框 */
+        body::before {
             content: "";
             position: fixed;
+            inset: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* 极致颗粒质感 */
+        .noise-overlay {
+            position: fixed;
             inset: 0;
-            background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
-            opacity: 0.05;
+            background: url('https://www.transparenttextures.com/patterns/pinstripe.png');
+            opacity: 0.03;
             pointer-events: none;
             z-index: 999;
+        }
+
+        /* 自定义禅意光标 */
+        #custom-cursor {
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+        }
+        #cursor-follower {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
         .page {
@@ -82,27 +114,30 @@
 
         #home-page h1 {
             font-family: var(--font-serif);
-            font-size: clamp(3rem, 10vw, 4.5rem);
-            letter-spacing: 2rem;
+            font-size: clamp(3.5rem, 12vw, 5.5rem);
+            letter-spacing: 2.5rem;
             font-weight: 200;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             text-align: center;
             z-index: 10;
             position: relative;
+            background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.4) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         #home-page p {
-            opacity: 0.4;
-            letter-spacing: 0.8rem;
-            font-size: 0.9rem;
+            opacity: 0.5;
+            letter-spacing: 1rem;
+            font-size: 0.95rem;
             margin-bottom: 60px;
             text-align: center;
             z-index: 10;
             position: relative;
             font-weight: 200;
+            text-transform: uppercase;
         }
 
-        /* 首页装饰元素 */
         .home-decor {
             position: absolute;
             width: 100%;
@@ -114,30 +149,43 @@
         }
 
         .enso-circle {
-            width: 450px;
-            height: 450px;
-            border: 1px solid rgba(255,255,255,0.03);
+            width: 600px;
+            height: 600px;
+            border: 1px solid rgba(255,255,255,0.05);
             border-radius: 50%;
             position: absolute;
-            animation: rotateEnso 20s linear infinite;
+            animation: rotateEnso 30s linear infinite;
         }
 
-        .enso-circle::before {
+        .enso-circle::before, .enso-circle::after {
             content: "";
             position: absolute;
-            top: -2px;
-            left: 50%;
-            width: 4px;
-            height: 4px;
+            width: 2px;
+            height: 2px;
             background: #fff;
             border-radius: 50%;
-            box-shadow: 0 0 15px #fff;
-            opacity: 0.3;
+            box-shadow: 0 0 20px #fff;
+            opacity: 0.4;
         }
+        .enso-circle::before { top: -1px; left: 50%; }
+        .enso-circle::after { bottom: -1px; left: 50%; }
 
         @keyframes rotateEnso {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from { transform: rotate(0deg) scale(0.95); }
+            50% { transform: rotate(180deg) scale(1.05); }
+            to { transform: rotate(360deg) scale(0.95); }
+        }
+
+        .side-info {
+            position: absolute;
+            left: 50px;
+            bottom: 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            opacity: 0.2;
+            font-size: 0.55rem;
+            letter-spacing: 3px;
         }
 
         .side-text {
@@ -145,8 +193,8 @@
             top: 50%;
             transform: translateY(-50%) rotate(-90deg);
             font-size: 0.6rem;
-            letter-spacing: 8px;
-            opacity: 0.15;
+            letter-spacing: 12px;
+            opacity: 0.1;
             text-transform: uppercase;
             white-space: nowrap;
         }
@@ -156,11 +204,11 @@
 
         .ver-tag {
             position: absolute;
-            bottom: 40px;
-            right: 45px;
+            top: 50px;
+            right: 50px;
             font-size: 0.55rem;
-            opacity: 0.1;
-            letter-spacing: 3px;
+            opacity: 0.2;
+            letter-spacing: 5px;
             writing-mode: vertical-rl;
         }
 
@@ -344,17 +392,26 @@
 </head>
 <body>
 
+    <div class="noise-overlay"></div>
+    <div id="custom-cursor"></div>
+    <div id="cursor-follower"></div>
+
     <div class="aura-bg">
-        <div class="aura-glow" id="bg-glow"></div>
+        <div class="aura-glow" id="bg-glow" style="width: 120vw; height: 120vw; opacity: 0.2;"></div>
+        <div class="aura-glow" style="background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); width: 60vw; height: 60vw; left: 20%; top: 20%;"></div>
     </div>
 
     <!-- 1. 首页 -->
     <div id="home-page" class="page active">
         <div class="home-decor">
             <div class="enso-circle"></div>
-            <div class="side-text left">Celestial Echo // 鸣应</div>
-            <div class="side-text right">Zen Perception // 觉知</div>
-            <div class="ver-tag">Release v 1.5</div>
+            <div class="side-text left">Mindful Interface // 觉知</div>
+            <div class="side-text right">Celestial Echo // 鸣应</div>
+            <div class="ver-tag">Version 1.5 // Release</div>
+            <div class="side-info">
+                <span>PROJECT - YINLIAO</span>
+                <span>DESIGN - ZEN VISION</span>
+            </div>
         </div>
         <h1>灵犀感知</h1>
         <p>万物气韵 · 映照本心</p>
@@ -398,12 +455,18 @@
 
     <script>
         const apiKey = "AIzaSyBw0YbGjGrh2h2suRsTHNU8jXppFgDQkdk"; 
-        const pages = {
-            home: document.getElementById('home-page'),
-            scan: document.getElementById('scan-page'),
-            result: document.getElementById('result-page')
-        };
-        const video = document.getElementById('webcam');
+        const cursor = document.getElementById('custom-cursor');
+        const follower = document.getElementById('cursor-follower');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+            follower.style.transform = `translate3d(${e.clientX - 20}px, ${e.clientY - 20}px, 0)`;
+            
+            // 背景光影随动
+            const x = (e.clientX / window.innerWidth) * 20;
+            const y = (e.clientY / window.innerHeight) * 20;
+            bgGlow.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+        });
         const canvas = document.getElementById('capture-canvas');
         const bgGlow = document.getElementById('bg-glow');
         const progressVal = document.getElementById('progress-val');
