@@ -16,7 +16,7 @@
         * {
             box-sizing: border-box;
             -webkit-font-smoothing: antialiased;
-            cursor: none; /* 禁用默认光标 */
+            /* 恢复系统光标，确保点击精准度 */
         }
 
         body {
@@ -54,24 +54,28 @@
 
         /* 自定义禅意光标 */
         #custom-cursor {
-            width: 10px;
-            height: 10px;
-            background: #fff;
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.1s ease;
+            display: none; /* 隐藏模拟的中心点，改用真实光标 */
         }
         #cursor-follower {
             width: 40px;
             height: 40px;
-            border: 1px solid rgba(255,255,255,0.3);
+            border: 1px solid rgba(255,255,255,0.4);
             border-radius: 50%;
             position: fixed;
             pointer-events: none;
             z-index: 9998;
-            transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+            /* 使用更平滑的跟随动效 */
+            transition: transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1), 
+                        width 0.3s ease, height 0.3s ease, border-color 0.3s ease;
+            transform: translate3d(-50%, -50%, 0);
+        }
+
+        /* 鼠标悬停在按钮上时，光环放大提示 */
+        .btn:hover ~ #cursor-follower {
+            width: 60px;
+            height: 60px;
+            border-color: #fff;
+            background: rgba(255,255,255,0.05);
         }
 
         .page {
@@ -465,8 +469,9 @@
         const follower = document.getElementById('cursor-follower');
 
         document.addEventListener('mousemove', (e) => {
-            cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
-            follower.style.transform = `translate3d(${e.clientX - 20}px, ${e.clientY - 20}px, 0)`;
+            // 让光环居中跟随真实鼠标
+            follower.style.left = e.clientX + 'px';
+            follower.style.top = e.clientY + 'px';
             
             // 背景光影随动
             const x = (e.clientX / window.innerWidth) * 20;
