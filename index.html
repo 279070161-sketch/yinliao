@@ -308,25 +308,14 @@
             overflow: hidden;
         }
 
-        /* 瓶子叠加图层样式 */
-        #product-overlay {
+        .art-box::before {
+            content: "";
             position: absolute;
-            right: 15%;
-            bottom: 10%;
-            width: 35%;
-            z-index: 100;
-            display: none;
-            filter: contrast(1.05) brightness(0.95) drop-shadow(0 10px 30px rgba(0,0,0,0.5));
-            animation: bottleFloat 6s ease-in-out infinite;
+            inset: 0;
+            background: radial-gradient(circle, var(--dynamic-color) 0%, transparent 80%);
+            opacity: 0.2;
+            animation: pulse 4s infinite;
         }
-
-        #product-overlay img {
-            width: 100%;
-            height: auto;
-            border-radius: 5px;
-        }
-
-        @keyframes bottleFloat {
             0%, 100% { transform: translateY(0) rotate(0deg); }
             50% { transform: translateY(-10px) rotate(2deg); }
         }
@@ -467,10 +456,6 @@
                     <div id="art-loading-text">画卷铺展中...</div>
                 </div>
                 <img id="art-img" alt="Gongbi Aesthetic Art">
-                <!-- 产品叠加层 -->
-                <div id="product-overlay">
-                    <img id="overlay-bottle-img" src="">
-                </div>
             </div>
             <div class="info-box">
                 <span class="label">Soul Resonance // 鸣应</span>
@@ -611,21 +596,17 @@
             }
 
             try {
-                // 推广版：结果固定为鸭屎香柠檬茶，不再消耗 API 识别文字
+                // 恢复 AI 识别，但结果依然倾向于鸭屎香柠檬茶的意境
                 const fixedData = {
                     "fortuneTitle": "灵犀通幽",
                     "hexCode": "#8fb935",
                     "drinkName": "鸭屎香柠檬茶",
                     "reason": "此茶气韵清雅高锐，如林间初雨。入口清爽涤烦，最衬此番观照本心之境。不仅是味蕾的邂逅，更是灵魂的鸣应。",
-                    "visualKeywords": "serene person elegantly presenting a gift"
+                    "visualKeywords": "serene person holding a tea bottle"
                 };
 
                 updateUI(fixedData);
                 showPage('result');
-                
-                // 设置叠加层图片
-                document.getElementById('overlay-bottle-img').src = `data:image/jpeg;base64,${bottleRefBase64}`;
-                
                 generateArt(base64, fixedData);
             } catch (e) {
                 console.error(e);
@@ -642,18 +623,23 @@
             }, 3000);
 
             try {
-                // 生图 Prompt 调整：为图层叠加预留空间，生成人物和背景，但不画瓶子
-                const artPrompt = `A high-quality Traditional Chinese Gongbi (meticulous style) painting on weathered silk texture. 
-                SUBJECT: A serene person (based on Image 1 features) in elegant traditional robes, standing gracefully in a peaceful primeval landscape with misty mountains. 
-                COMPOSITION: The person is extending their hands as if presenting a precious treasure in the center-right foreground. 
-                IMPORTANT: Leave a clear space in their hands. Focus on the poetic atmosphere, fine ink lines, and mineral pigments.`;
+                // 深度优化：双图强力参考 + 高相似度指令
+                const artPrompt = `This is a high-end traditional Chinese Gongbi style masterpiece. 
+                CHARACTER SIMILARITY: Maintain 100% resemblance to the person in Image 1 (facial features, expression, vibe). 
+                PRODUCT FIDELITY: The character is naturally holding and presenting the EXACT bottle from Image 2. Replicate the tapered bottle shape and its lime-green label perfectly. 
+                ATMOSPHERE: A serene Zen garden with misty mountains. Fine ink lines, mineral pigments, weathered silk texture. 
+                Everything should be harmoniously blended into one cohesive painting.`;
                 
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{
-                            parts: [ { text: artPrompt }, { inlineData: { mimeType: "image/jpeg", data: base64 } } ]
+                            parts: [ 
+                                { text: artPrompt }, 
+                                { inlineData: { mimeType: "image/jpeg", data: base64 } }, // 图 1：人物抓拍
+                                { inlineData: { mimeType: "image/jpeg", data: bottleRefBase64 } } // 图 2：瓶子标准图
+                            ]
                         }],
                         generationConfig: { responseModalities: ['TEXT', 'IMAGE'] }
                     })
@@ -669,8 +655,6 @@
                     img.onload = () => {
                         img.style.display = "block";
                         document.getElementById('art-loading').style.display = 'none';
-                        // 显示产品叠加层
-                        document.getElementById('product-overlay').style.display = 'block';
                     };
                 } else {
                     if (retryCount < 1) {
