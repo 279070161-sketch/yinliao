@@ -390,33 +390,9 @@
         async function detectionLoop(now) {
             if (!isScanning) return;
             
-            // 超过 5 秒还没识别出来，显示手动按钮
-            if (now - lastDetect > 5000) {
-                document.getElementById('manual-trigger').style.display = 'block';
-            }
-
+            // 摄像头开启 2 秒后自动进入下一步，无需手势识别
             if (now - lastDetect > 2000) {
-                lastDetect = now;
-                const ctx = c.getContext('2d'); 
-                c.width = 320; c.height = 240; // 提高识别分辨率
-                ctx.drawImage(v, 0, 0, 320, 240);
-                const b64 = c.toDataURL('image/jpeg', 0.5).split(',')[1];
-                
-                if (!apiKey) {
-                    console.warn("未配置 API Key，无法进行自动识别。请点击下方按钮手动开始。");
-                    return;
-                }
-
-                try {
-                    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-                        method: 'POST',
-                        body: JSON.stringify({ contents: [{ parts: [{ text: "图中人是否正在做合十礼（双手合掌放在胸前，通常用于祈祷或问候）？请仔细观察。只需回答 YES 或 NO。" }, { inlineData: { mimeType: "image/jpeg", data: b64 } }] }] })
-                    });
-                    const d = await resp.json();
-                    if (d.candidates?.[0]?.content?.parts?.[0]?.text?.toUpperCase().includes('YES')) {
-                        forceProcess();
-                    }
-                } catch (e) {}
+                forceProcess();
             }
             requestAnimationFrame(detectionLoop);
         }
