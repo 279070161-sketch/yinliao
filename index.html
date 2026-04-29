@@ -286,7 +286,7 @@
         </div>
         <div class="scan-progress-box">
             <div class="progress-text" id="progress-val">等待缘起</div>
-            <div class="gesture-hint" id="gesture-hint">请面对镜头，双手合十<br>心诚则灵，感应即刻开启</div>
+            <div class="gesture-hint" id="gesture-hint">请面对镜头，握紧拳头<br>心领神会，感应即刻开启</div>
         </div>
     </div>
 
@@ -367,7 +367,7 @@
                     body: JSON.stringify({
                         contents: [{ 
                             parts: [
-                                { text: "Is the person in the image joining their hands together in a prayer/greeting gesture (hands pressed together, palm to palm)? Respond ONLY with 'YES' or 'NO'." }, 
+                                { text: "Is the person in the image making a fist with their hand? Respond ONLY with 'YES' or 'NO'." }, 
                                 { inlineData: { mimeType: "image/jpeg", data: base64 } }
                             ] 
                         }]
@@ -391,7 +391,7 @@
             isAnalyzing = true;
             flash.style.opacity = "0.8";
             progressVal.innerText = "灵犀已通";
-            gestureHint.innerText = "感应到赤诚之气，正在解读万象...";
+            gestureHint.innerText = "感应到拳中志向，正在解读万象...";
             gestureHint.style.opacity = "0.8";
 
             setTimeout(() => {
