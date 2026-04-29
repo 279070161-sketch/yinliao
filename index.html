@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>靈犀感知 · 禪意視覺</title>
+    <title>灵犀感知 · 禅意视觉</title>
     <style>
         :root {
             --primary-dark: #050505;
@@ -214,30 +214,30 @@
     <div class="aura-bg"><div class="glow" id="main-glow"></div></div>
     
     <div id="download-overlay" onclick="this.classList.remove('active')">
-        <img id="preview-img" src="" alt="靈犀藝術">
-        <p class="download-hint">長按圖片保存至相冊</p>
-        <button class="btn" style="margin-top: 30px;">關閉預覽</button>
+        <img id="preview-img" src="" alt="灵犀艺术">
+        <p class="download-hint">长按图片保存至相册</p>
+        <button class="btn" style="margin-top: 30px;">关闭预览</button>
     </div>
 
     <div id="wave-transition">
         <svg class="wave-svg" id="wave-canvas"></svg>
         <div class="ink-content">
-            靈犀微動
-            <div style="font-size: 0.7rem; letter-spacing: 6px; opacity: 0.5; margin-top: 15px;">心之所向 · 見此本心</div>
+            灵犀微动
+            <div style="font-size: 0.7rem; letter-spacing: 6px; opacity: 0.5; margin-top: 15px;">心之所向 · 见此本心</div>
         </div>
     </div>
 
     <div id="home-page" class="page active">
-        <h1>靈犀感知</h1>
-        <p style="letter-spacing: 8px; opacity: 0.3; font-size: 0.8rem; font-family: var(--font-serif); margin-bottom: 40px;">尋芳覓影 · 此時此刻</p>
-        <button class="btn btn-primary" onclick="initExperience()">開啟感知</button>
+        <h1>灵犀感知</h1>
+        <p style="letter-spacing: 8px; opacity: 0.3; font-size: 0.8rem; font-family: var(--font-serif); margin-bottom: 40px;">寻芳觅影 · 此时此刻</p>
+        <button class="btn btn-primary" onclick="initExperience()">开启感知</button>
     </div>
 
     <div id="scan-page" class="page">
         <div class="scan-container" id="scan-box">
             <video id="webcam" autoplay playsinline></video>
             <div style="position:absolute; inset:0; background:radial-gradient(circle, transparent 40%, #000 120%); display:flex; align-items:center; justify-content:center;">
-                <div style="font-family:var(--font-serif); font-size:0.9rem; letter-spacing:4px; color:rgba(255,255,255,0.6); animation: pulse 2s infinite;">請雙手合十</div>
+                <div style="font-family:var(--font-serif); font-size:0.9rem; letter-spacing:4px; color:rgba(255,255,255,0.6); animation: pulse 2s infinite;">请双手合十</div>
             </div>
         </div>
         <p style="margin-top:40px; font-size:0.7rem; opacity:0.3; letter-spacing:4px; font-family:var(--font-serif);">靜候緣起，開啟覺知...</p>
@@ -251,29 +251,29 @@
                         <div class="ripple"></div>
                         <div class="ripple" style="animation-delay:1s"></div>
                     </div>
-                    <div style="font-size: 0.65rem; opacity: 0.4; letter-spacing: 3px; font-family: var(--font-serif);">正在照見本心</div>
+                    <div style="font-size: 0.65rem; opacity: 0.4; letter-spacing: 3px; font-family: var(--font-serif);">正在照见本心</div>
                 </div>
                 <img id="art-img">
             </div>
             <div class="info-panel">
-                <span style="font-size:0.6rem; letter-spacing:4px; color:rgba(255,255,255,0.4); margin-bottom:10px; display:block;">CELESTIAL ECHO // 鳴應</span>
+                <span style="font-size:0.6rem; letter-spacing:4px; color:rgba(255,255,255,0.4); margin-bottom:10px; display:block;">CELESTIAL ECHO // 鸣应</span>
                 <h2 id="res-title">正在感悟</h2>
                 <div id="res-drink">...</div>
                 
                 <div class="content-section">
-                    <span class="section-label">【 氣韻分析 】</span>
+                    <span class="section-label">【 气韵分析 】</span>
                     <p id="res-aura" class="section-text">正在感悟...</p>
                 </div>
 
                 <div class="content-section">
-                    <span class="section-label">【 薦飲之由 】</span>
+                    <span class="section-label">【 荐饮之由 】</span>
                     <p id="res-reason" class="section-text">正在尋味...</p>
                 </div>
 
                 <div class="button-group">
                     <!-- 确保查看大图按钮 ID 正确且在生成后显示 -->
-                    <button id="view-full-btn" class="btn btn-primary" onclick="showPreview()" style="display:none;">查看全圖</button>
-                    <button class="btn" onclick="location.reload()">再續前緣</button>
+                    <button id="view-full-btn" class="btn btn-primary" onclick="showPreview()" style="display:none;">查看全图</button>
+                    <button class="btn" onclick="location.reload()">再续前缘</button>
                 </div>
             </div>
         </div>
@@ -298,7 +298,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: `以極具禪意、優雅且緩慢的語氣朗讀這段話：${text}` }] }],
+                        contents: [{ parts: [{ text: `以极具禅意、优雅且缓慢的语气朗读这段话：${text}` }] }],
                         generationConfig: { 
                             responseModalities: ["AUDIO"],
                             speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Charon" } } } 
@@ -323,7 +323,7 @@
         }
 
         function initExperience() {
-            speak("閉上眼，深呼吸。當你心神安定時，雙手合十，讓我照見你的氣場。");
+            speak("闭上眼，深呼吸。当你心神安定时，双手合十，让我照见你的气场。");
             document.getElementById('home-page').classList.remove('active');
             document.getElementById('scan-page').classList.add('active');
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then(s => { v.srcObject = s; isScanning = true; requestAnimationFrame(detectionLoop); });
@@ -383,7 +383,7 @@
                 document.getElementById('result-page').classList.add('active');
                 setTimeout(() => { waveTrans.classList.remove('active'); }, 1000);
                 
-                speak(`緣分已至。${data.fortuneTitle}。${data.auraAnalysis}。為你薦飲 ${data.drinkName}，因為 ${data.recommendationReason}`);
+                speak(`缘分已至。${data.fortuneTitle}。${data.auraAnalysis}。为你荐饮 ${data.drinkName}，因为 ${data.recommendationReason}`);
                 
                 // 开始生成图片
                 generateArt(highRes, data);
