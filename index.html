@@ -455,6 +455,12 @@
 
     <script>
         const apiKey = "AIzaSyBw0YbGjGrh2h2suRsTHNU8jXppFgDQkdk"; 
+        const pages = {
+            home: document.getElementById('home-page'),
+            scan: document.getElementById('scan-page'),
+            result: document.getElementById('result-page')
+        };
+        const video = document.getElementById('webcam');
         const cursor = document.getElementById('custom-cursor');
         const follower = document.getElementById('cursor-follower');
 
@@ -465,7 +471,7 @@
             // 背景光影随动
             const x = (e.clientX / window.innerWidth) * 20;
             const y = (e.clientY / window.innerHeight) * 20;
-            bgGlow.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+            if (bgGlow) bgGlow.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
         });
         const canvas = document.getElementById('capture-canvas');
         const bgGlow = document.getElementById('bg-glow');
