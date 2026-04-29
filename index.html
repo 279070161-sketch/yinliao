@@ -431,6 +431,12 @@
             <video id="webcam" autoplay playsinline></video>
             <div class="ink-overlay"></div>
             <div id="flash" class="flash-overlay"></div>
+            <!-- 手动上传入口，应对预览环境摄像头受限 -->
+            <div id="upload-fallback" style="position: absolute; bottom: 20px; width: 100%; text-align: center; z-index: 200;">
+                <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 10px;">若摄像头无法开启，请点击下方上传</p>
+                <button class="btn" style="padding: 10px 20px; font-size: 14px;" onclick="document.getElementById('manual-file').click()">选择照片</button>
+                <input type="file" id="manual-file" style="display:none" accept="image/*" onchange="handleManualUpload(this)">
+            </div>
         </div>
         <div class="scan-progress-box">
             <div class="progress-text" id="progress-val">等待缘起</div>
@@ -560,7 +566,16 @@
 
             setTimeout(() => {
                 flash.style.opacity = "0";
-                runAnalysis();
+                const ctx = canvas.getContext('2d');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0);
+                const base64 = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
+
+                if (video.srcObject) {
+                    video.srcObject.getTracks().forEach(t => t.stop());
+                }
+                startAnalysisWithImage(base64);
             }, 600);
         }
 
@@ -575,19 +590,34 @@
             showPage('home');
         }
 
-        async function runAnalysis() {
-            const ctx = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0);
-            const base64 = canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
-
-            if (video.srcObject) {
-                video.srcObject.getTracks().forEach(t => t.stop());
+        // 处理手动上传的照片
+        function handleManualUpload(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64 = e.target.result.split(',')[1];
+                    // 开始分析流程
+                    startAnalysisWithImage(base64);
+                };
+                reader.readAsDataURL(input.files[0]);
             }
+        }
 
+        // 统一的分析入口
+        async function startAnalysisWithImage(base64) {
+            isAnalyzing = true;
+            flash.style.opacity = "0.8";
+            progressVal.innerText = "灵犀已通";
+            gestureHint.innerText = "感应到画中气韵，正在解读万象...";
+            gestureHint.style.opacity = "0.8";
+
+            setTimeout(() => {
+                runAnalysisWithData(base64);
+            }, 1000);
+        }
+
+        async function runAnalysisWithData(base64) {
             try {
-                // 恢复 AI 识别，但结果依然倾向于鸭屎香柠檬茶的意境
                 const fixedData = {
                     "fortuneTitle": "灵犀通幽",
                     "hexCode": "#8fb935",
