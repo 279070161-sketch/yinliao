@@ -323,10 +323,27 @@
         }
 
         function initExperience() {
-            speak("闭上眼，深呼吸。当你心神安定时，双手合十，让我照见你的气场。");
             document.getElementById('home-page').classList.remove('active');
             document.getElementById('scan-page').classList.add('active');
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then(s => { v.srcObject = s; isScanning = true; requestAnimationFrame(detectionLoop); });
+            
+            speak("闭上眼，深呼吸。当你心神安定时，双手合十，让我照见你的气场。");
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                console.warn("浏览器不支持摄像头或处于非安全环境");
+                setTimeout(processAnalysis, 3000); 
+                return;
+            }
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+                .then(s => { 
+                    v.srcObject = s; 
+                    isScanning = true; 
+                    requestAnimationFrame(detectionLoop); 
+                })
+                .catch(err => {
+                    console.warn("摄像头开启失败:", err);
+                    setTimeout(processAnalysis, 3000);
+                });
         }
 
         let lastDetect = 0;
