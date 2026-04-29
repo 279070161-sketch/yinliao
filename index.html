@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>灵犀感知 · 品牌定制版</title>
+    <title>灵犀感知 · 禅意视觉 1.6</title>
     <style>
         :root {
             --primary-dark: #050505;
@@ -31,7 +31,7 @@
             overflow: hidden;
         }
 
-        /* 画廊式全局边框 */
+        /* 顶级画廊边框与纹理 */
         body::before {
             content: "";
             position: fixed;
@@ -50,6 +50,7 @@
             z-index: 999;
         }
 
+        /* 磁吸光标 */
         #cursor-follower {
             width: 40px;
             height: 40px;
@@ -71,202 +72,128 @@
             justify-content: center;
             align-items: center;
             padding: 40px;
-            transition: opacity 1.2s ease;
             z-index: 10;
         }
 
-        .page.active { display: flex; animation: fadeIn 1.5s ease forwards; }
+        .page.active { display: flex; animation: fadeIn 1.2s ease forwards; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .aura-bg {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            background: #000;
-        }
-
+        .aura-bg { position: fixed; inset: 0; z-index: -1; background: #000; }
         .aura-glow {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80vw;
-            height: 80vw;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 80vw; height: 80vw;
             background: radial-gradient(circle, var(--dynamic-color) 0%, transparent 70%);
-            filter: blur(120px);
-            opacity: 0.3;
-            transition: all 4s ease-in-out;
+            filter: blur(120px); opacity: 0.2; transition: all 4s ease;
         }
 
-        /* 配置页样式 */
+        /* 配置页设计 */
         .setup-box {
             background: rgba(255,255,255,0.02);
             border: 1px solid rgba(255,255,255,0.1);
-            padding: 50px;
-            border-radius: 4px;
+            padding: 60px;
+            border-radius: 2px;
             width: 100%;
-            max-width: 600px;
+            max-width: 650px;
             text-align: center;
+            backdrop-filter: blur(10px);
         }
 
-        .input-group {
-            margin-bottom: 30px;
-            text-align: left;
-        }
-
+        .input-group { margin-bottom: 40px; text-align: left; }
         .input-group label {
-            display: block;
-            font-size: 0.7rem;
-            letter-spacing: 3px;
-            margin-bottom: 15px;
-            opacity: 0.6;
+            display: block; font-size: 0.65rem; letter-spacing: 4px;
+            margin-bottom: 20px; opacity: 0.4; text-transform: uppercase;
         }
 
         .input-group input[type="text"] {
-            width: 100%;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #fff;
-            padding: 15px;
-            font-size: 1rem;
-            letter-spacing: 2px;
+            width: 100%; background: none; border: none;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            color: #fff; padding: 15px 0; font-size: 1.1rem;
+            letter-spacing: 2px; transition: border-color 0.5s;
         }
+        .input-group input:focus { border-color: #fff; outline: none; }
 
         .product-preview-box {
+            width: 100%; height: 180px; border: 1px dashed rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 30px; cursor: pointer; transition: 0.5s;
+        }
+        .product-preview-box:hover { border-color: rgba(255,255,255,0.4); }
+        .product-preview-box img { max-height: 100%; object-fit: contain; }
+
+        /* 首页设计 */
+        #home-page h1 {
+            font-family: var(--font-serif);
+            font-size: clamp(3.5rem, 12vw, 6rem);
+            letter-spacing: 3rem; font-weight: 200;
+            margin-bottom: 40px; padding-left: 3rem;
+            background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.3) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* 结果页黄金比例排版 */
+        .result-container {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 100px;
+            max-width: 1300px;
             width: 100%;
-            height: 200px;
-            border: 1px dashed rgba(255,255,255,0.2);
-            display: flex;
             align-items: center;
-            justify-content: center;
-            margin-bottom: 30px;
-            overflow: hidden;
-            cursor: pointer;
         }
 
-        .product-preview-box img {
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        /* 结果页画盒 */
         .art-box {
-            width: 100%;
-            aspect-ratio: 4/5;
-            background: #0d0d0f;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 100%; aspect-ratio: 4/5; background: #0d0d0f;
+            position: relative; overflow: hidden;
             border: 1px solid rgba(255,255,255,0.05);
-            overflow: hidden;
         }
 
         #art-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-            z-index: 5;
-            animation: imageReveal 3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%; height: 100%; object-fit: cover;
+            display: none; animation: imageReveal 3s ease;
         }
 
-        /* 商业级产品叠加层 */
-        #product-overlay {
-            position: absolute;
-            right: 15%;
-            bottom: 8%;
-            width: 35%;
-            z-index: 100;
-            display: none;
-            filter: contrast(1.1) brightness(0.95) drop-shadow(0 15px 35px rgba(0,0,0,0.5));
-            animation: bottleFloat 6s ease-in-out infinite;
-        }
-
-        #product-overlay img { width: 100%; height: auto; }
-
-        @keyframes bottleFloat {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(2deg); }
+        .info-box { padding-right: 40px; }
+        .ver-tag {
+            writing-mode: vertical-rl;
+            position: absolute; left: 40px; top: 40px;
+            font-size: 0.6rem; letter-spacing: 5px; opacity: 0.3;
         }
 
         .btn {
-            background: none;
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #fff;
-            padding: 20px 50px;
-            font-size: 0.7rem;
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 100;
+            background: none; border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; padding: 18px 45px; font-size: 0.65rem;
+            letter-spacing: 6px; text-transform: uppercase;
+            cursor: pointer; transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
+        .btn:hover { background: #fff; color: #000; border-color: #fff; transform: translateY(-5px); }
 
-        .btn:hover { background: #fff; color: #000; border-color: #fff; }
-
-        #home-page h1 {
-            font-family: var(--font-serif);
-            font-size: clamp(3.5rem, 12vw, 5.5rem);
-            letter-spacing: 2.5rem;
-            font-weight: 200;
-            margin-bottom: 30px;
-            background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.4) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            padding-left: 2.5rem; 
+        .manifesting-circle {
+            width: 45px; height: 45px; border: 1px solid rgba(255,255,255,0.05);
+            border-top-color: rgba(255,255,255,0.5); border-radius: 50%;
+            animation: spin 1.5s linear infinite;
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .scan-viewport {
-            position: relative;
-            width: 100%;
-            max-width: 450px;
-            aspect-ratio: 3/4;
-            background: #000;
-            overflow: hidden;
-        }
-
-        #webcam {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scaleX(-1);
-            filter: grayscale(1) contrast(0.9) brightness(1.1) blur(2px) sepia(0.2);
-            opacity: 0.7;
-        }
-
-        .info-box { display: flex; flex-direction: column; justify-content: center; }
-        #fortune-title { font-family: var(--font-serif); font-size: 3rem; margin: 0; font-weight: 300; }
-        #drink-name { font-family: var(--font-serif); font-size: 1.6rem; margin: 25px 0; font-weight: 300; }
-        #reason { font-size: 0.9rem; line-height: 2.4; opacity: 0.5; text-align: justify; }
+        #fortune-title { font-family: var(--font-serif); font-size: 3.5rem; margin: 0; font-weight: 200; }
+        #drink-name { font-family: var(--font-serif); font-size: 1.8rem; margin: 30px 0; font-weight: 200; opacity: 0.8; }
+        #reason { font-size: 0.9rem; line-height: 2.6; opacity: 0.4; text-align: justify; font-weight: 300; }
 
         @keyframes imageReveal {
-            from { opacity: 0; filter: blur(30px) brightness(1.5); }
+            from { opacity: 0; filter: blur(40px) brightness(1.5); }
             to { opacity: 1; filter: blur(0) brightness(1); }
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .manifesting-circle {
-            width: 40px;
-            height: 40px;
-            border: 1px solid rgba(255,255,255,0.05);
-            border-top-color: rgba(255,255,255,0.6);
-            border-radius: 50%;
-            animation: spin 1.5s linear infinite;
+        .scan-viewport {
+            width: 100%; max-width: 480px; aspect-ratio: 3/4;
+            background: #000; position: relative; overflow: hidden;
         }
+        #webcam { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); opacity: 0.6; filter: sepia(0.2); }
 
-        .version-tag {
-            position: fixed;
-            bottom: 40px;
-            left: 40px;
-            font-size: 0.6rem;
-            letter-spacing: 4px;
-            opacity: 0.3;
-            text-transform: uppercase;
+        .side-text {
+            position: fixed; right: 40px; bottom: 40px;
+            font-size: 0.6rem; letter-spacing: 4px; opacity: 0.2;
+            writing-mode: vertical-rl;
         }
     </style>
 </head>
@@ -275,35 +202,37 @@
     <div class="noise-overlay"></div>
     <div id="cursor-follower"></div>
     <div class="aura-bg"><div class="aura-glow" id="bg-glow"></div></div>
-    <div class="version-tag">Product Promo Edition // v 1.6</div>
+    
+    <div class="ver-tag">ZEN VISION // PROMO</div>
+    <div class="side-text">PROJECT YINLIAO v 1.6</div>
 
-    <!-- 1. 配置页 (新增) -->
+    <!-- 1. 配置页 -->
     <div id="setup-page" class="page active">
         <div class="setup-box">
-            <h2 style="font-family:var(--font-serif); font-weight:200; letter-spacing:10px; margin-bottom:40px;">品牌感悟配置</h2>
+            <h2 style="font-family:var(--font-serif); font-weight:200; letter-spacing:12px; margin-bottom:50px; opacity:0.8;">产品心领配置</h2>
             
             <div class="input-group">
-                <label>1. 上传饮料实物图 (透明背景最佳)</label>
+                <label>专属产品形象 // UPLOAD</label>
                 <div class="product-preview-box" onclick="document.getElementById('setup-file').click()">
                     <img id="setup-preview" src="" style="display:none">
-                    <span id="setup-placeholder" style="opacity:0.4; font-size:0.7rem; letter-spacing:2px;">点击上传产品照片</span>
+                    <span id="setup-placeholder" style="opacity:0.3; font-size:0.65rem; letter-spacing:3px;">点击上传高清实物图</span>
                 </div>
                 <input type="file" id="setup-file" style="display:none" accept="image/*" onchange="handleSetupUpload(this)">
             </div>
 
             <div class="input-group">
-                <label>2. 输入产品名称</label>
-                <input type="text" id="setup-name" placeholder="例如：鸭屎香柠檬茶">
+                <label>产品鸣应名称 // NAME</label>
+                <input type="text" id="setup-name" placeholder="请输入完整产品名称">
             </div>
 
-            <button class="btn" onclick="saveSetup()">保存并进入首页</button>
+            <button class="btn" onclick="saveSetup()">保存并开启感悟</button>
         </div>
     </div>
 
     <!-- 2. 首页 -->
     <div id="home-page" class="page">
-        <h1>灵犀感知</h1>
-        <p style="letter-spacing:15px; opacity:0.5; margin-bottom:60px;">万物气韵 · 映照本心</p>
+        <h1 style="margin-bottom:60px;">灵犀感知</h1>
+        <p style="letter-spacing:18px; opacity:0.4; font-size:0.8rem; margin-bottom:80px; text-transform:uppercase;">万物气韵 · 映照本心</p>
         <button class="btn" onclick="goToScan()">开启感悟</button>
     </div>
 
@@ -311,29 +240,28 @@
     <div id="scan-page" class="page">
         <div class="scan-viewport">
             <video id="webcam" autoplay playsinline></video>
-            <div id="flash" style="position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; transition:opacity 0.3s; z-index:100;"></div>
+            <div id="flash" style="position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; transition:0.3s; z-index:100;"></div>
         </div>
-        <div class="progress-text" id="progress-val">等待缘起</div>
-        <div class="gesture-hint" id="gesture-hint">请面对镜头，举起大拇指<br>感应产品之气，即将开启...</div>
+        <p id="progress-val" style="margin-top:50px; font-family:var(--font-serif); letter-spacing:8px; font-size:0.9rem;">等待缘起</p>
+        <p style="font-size:0.65rem; letter-spacing:4px; opacity:0.3; line-height:2; text-align:center;">请面对镜头，举起大拇指<br>感应品牌之气...</p>
     </div>
 
     <!-- 4. 结果页 -->
     <div id="result-page" class="page">
         <div class="result-container">
             <div class="art-box">
-                <div id="art-loading" style="text-align: center; z-index: 10;">
+                <div id="art-loading" style="text-align: center; z-index: 10; position:absolute;">
                     <div class="manifesting-circle" style="margin: 0 auto;"></div>
-                    <div id="art-loading-text" style="margin-top:15px; font-size:0.6rem; letter-spacing:4px; opacity:0.4;">画卷铺展中...</div>
+                    <p style="margin-top:20px; font-size:0.6rem; letter-spacing:4px; opacity:0.3;">丹青挥毫中...</p>
                 </div>
-                <img id="art-img" alt="Gongbi Art">
-                <div id="product-overlay"><img id="overlay-img" src=""></div>
+                <img id="art-img">
             </div>
             <div class="info-box">
-                <span style="font-size:0.6rem; letter-spacing:5px; opacity:0.4; text-transform:uppercase;">Soul Resonance // 鸣应</span>
+                <span style="font-size:0.6rem; letter-spacing:6px; opacity:0.4; text-transform:uppercase; margin-bottom:20px; display:block;">Soul Resonance // 鸣应</span>
                 <h2 id="fortune-title">---</h2>
                 <div id="drink-name">---</div>
                 <p id="reason">---</p>
-                <button class="btn" onclick="reset()" style="align-self: flex-start;">重寻宿命</button>
+                <button class="btn" onclick="reset()" style="margin-top:50px;">重寻宿命</button>
             </div>
         </div>
     </div>
@@ -358,10 +286,13 @@
         let setupProductBase64 = "";
         let setupProductName = "";
 
-        // 鼠标跟随
+        // 磁吸光标逻辑
         document.addEventListener('mousemove', (e) => {
             follower.style.left = e.clientX + 'px';
             follower.style.top = e.clientY + 'px';
+            const x = (e.clientX / window.innerWidth) * 20;
+            const y = (e.clientY / window.innerHeight) * 20;
+            bgGlow.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
         });
 
         function showPage(pageId) {
@@ -369,7 +300,6 @@
             pages[pageId].classList.add('active');
         }
 
-        // 配置页上传处理
         function handleSetupUpload(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -386,7 +316,7 @@
         function saveSetup() {
             setupProductName = document.getElementById('setup-name').value;
             if (!setupProductBase64 || !setupProductName) {
-                alert("请先上传产品图片并输入名称");
+                alert("请先上传产品形象并输入名称");
                 return;
             }
             showPage('home');
@@ -403,7 +333,6 @@
             } catch (e) { alert("请允许摄像头权限"); }
         }
 
-        // 识别逻辑：现在只识别大拇指
         async function detectGestureLoop() {
             if (isAnalyzing || !pages.scan.classList.contains('active')) return;
             const ctx = canvas.getContext('2d');
@@ -428,31 +357,26 @@
                 const result = await response.json();
                 const text = result.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toUpperCase();
                 if (text && text.includes("YES")) {
-                    triggerSuccess(base64);
+                    isAnalyzing = true;
+                    document.getElementById('flash').style.opacity = "1";
+                    progressVal.innerText = "灵犀已通";
+                    setTimeout(() => {
+                        document.getElementById('flash').style.opacity = "0";
+                        if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+                        runAnalysis(base64);
+                    }, 300);
                 } else {
                     setTimeout(detectGestureLoop, 1500);
                 }
             } catch (e) { setTimeout(detectGestureLoop, 3000); }
         }
 
-        function triggerSuccess(base64) {
-            isAnalyzing = true;
-            document.getElementById('flash').style.opacity = "1";
-            progressVal.innerText = "灵犀已通";
-            setTimeout(() => {
-                document.getElementById('flash').style.opacity = "0";
-                if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
-                runAnalysis(base64);
-            }, 300);
-        }
-
-        async function runAnalysis(base64) {
-            // 使用配置页的数据
+        function runAnalysis(base64) {
             const data = {
                 "fortuneTitle": "万象生辉",
                 "hexCode": "#E6B800",
                 "drinkName": setupProductName,
-                "reason": `此物气韵与阁下心境相合。${setupProductName}之香，如林间初雨，最是涤烦。执此瓶，即是观照本心。`
+                "reason": `此物气韵与阁下本心鸣应。${setupProductName}之香，如林间初雨，透彻且深远。手持此瓶，即是执一份清醒，照见灵犀。`
             };
 
             document.getElementById('fortune-title').innerText = data.fortuneTitle;
@@ -462,18 +386,19 @@
             document.getElementById('reason').innerText = data.reason;
             bgGlow.style.background = `radial-gradient(circle, ${data.hexCode}33 0%, transparent 70%)`;
             
-            document.getElementById('overlay-img').src = `data:image/jpeg;base64,${setupProductBase64}`;
             showPage('result');
             generateArt(base64);
         }
 
         async function generateArt(userBase64) {
-            // AI 负责画人，代码负责贴产品
-            const artPrompt = `A masterpiece Traditional Chinese Gongbi style painting. 
-            Subject: A person (resembling the features in Image 1) in ethereal ancient robes, sitting in a misty Zen landscape. 
-            Pose: The person is elegantly presenting a gift in their right hand, centered towards the lower-right foreground. 
-            Style: Fine ink outlines, mineral pigments, weathered silk texture. 
-            IMPORTANT: Leave an aesthetic space in the hands for a product. Do not draw a generic cup.`;
+            // 终极指令：让 AI 照着图 2 的形象，画在图 1 人物的手里
+            const artPrompt = `This is a masterpiece Traditional Chinese Gongbi style painting. 
+            CHARACTER: Replicate the facial features and aura of the person in Image 1 exactly. 
+            PRODUCT FIDELITY: The person is elegantly holding the EXACT beverage bottle from Image 2. 
+            You MUST observe the bottle in Image 2 (its shape, white cap, and green label) and draw it into the person's hand as if it were a physical object being painted in Gongbi style. 
+            SCENE: Misty Zen scholar's garden. 
+            STYLE: Fine ink outlines, mineral pigments, aged silk texture. 
+            The bottle should be an integrated part of the painting, naturally held by the character.`;
 
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`, {
@@ -481,7 +406,11 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{
-                            parts: [ { text: artPrompt }, { inlineData: { mimeType: "image/jpeg", data: userBase64 } } ]
+                            parts: [ 
+                                { text: artPrompt }, 
+                                { inlineData: { mimeType: "image/jpeg", data: userBase64 } }, // 图 1：人物
+                                { inlineData: { mimeType: "image/jpeg", data: setupProductBase64 } } // 图 2：产品标准
+                            ]
                         }],
                         generationConfig: { responseModalities: ['TEXT', 'IMAGE'] }
                     })
@@ -496,17 +425,13 @@
                     artImg.onload = () => {
                         artImg.style.display = "block";
                         document.getElementById('art-loading').style.display = "none";
-                        document.getElementById('product-overlay').style.display = "block";
                     };
                 }
-            } catch (e) {
-                console.log("Art failed");
-            }
+            } catch (e) { console.log("Art failed"); }
         }
 
         function reset() {
             document.getElementById('art-img').style.display = 'none';
-            document.getElementById('product-overlay').style.display = 'none';
             document.getElementById('art-loading').style.display = 'block';
             showPage('home');
         }
