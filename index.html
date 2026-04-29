@@ -459,6 +459,9 @@
 
     <script>
         const apiKey = "AIzaSyBw0YbGjGrh2h2suRsTHNU8jXppFgDQkdk"; 
+        // 预设的产品实物参考图 (奈雪柠檬茶)
+        const bottleRefBase64 = "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)
+";
         const pages = {
             home: document.getElementById('home-page'),
             scan: document.getElementById('scan-page'),
@@ -627,20 +630,24 @@
             }, 3000);
 
             try {
-                // 生图 Prompt 调整：瓶子外形参考奈雪柠檬茶
-                const artPrompt = `A high-quality Traditional Chinese Gongbi (meticulous style) painting on weathered silk texture. 
-                SUBJECT: A serene person (based on ${data.visualKeywords}) elegantly holding a modern tea bottle. 
-                BOTTLE DESIGN: The bottle has a distinctive tapered, angular shoulder and a white cap. The label is a vibrant lime-green with a large, fresh lemon slice illustration. The bottle shape is sleek and modern.
-                ATTIRE: Wearing sophisticated ${data.hexCode} traditional Chinese robes. 
-                SETTING: Sitting or standing in a peaceful primeval landscape with misty mountains and gnarled pines. 
-                STYLE: Fine ink lines, rich mineral pigment, antique sepia patina, poetic atmosphere. NO prayer gesture, focus on the harmony between the person and the drink.`;
+                // 双图强力参考：图 1 为人脸，图 2 为瓶子实物
+                const artPrompt = `This is a premium commercial product promotion artwork in Traditional Chinese Gongbi style. 
+                STRICT REQUIREMENT: Use Image 1 ONLY for the person's facial features and expression. 
+                HERO PRODUCT: Use Image 2 as the EXCLUSIVE reference for the beverage bottle. 
+                You MUST replicate the bottle in Image 2 with 100% accuracy: the tapered angular shoulder, the white cap, and the exact lime-green label with the lemon slice illustration. DO NOT artisticize or simplify the bottle features. 
+                SCENE: The person is elegantly presenting the bottle in a misty Zen garden. 
+                STYLE: Fine ink lines, mineral pigments, weathered silk texture, professional high-end advertising aesthetic.`;
                 
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{
-                            parts: [ { text: artPrompt }, { inlineData: { mimeType: "image/jpeg", data: base64 } } ]
+                            parts: [ 
+                                { text: artPrompt }, 
+                                { inlineData: { mimeType: "image/jpeg", data: base64 } }, // 图 1：人物
+                                { inlineData: { mimeType: "image/jpeg", data: bottleRefBase64 } } // 图 2：瓶子实物
+                            ]
                         }],
                         generationConfig: { responseModalities: ['TEXT', 'IMAGE'] }
                     })
