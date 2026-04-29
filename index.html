@@ -112,7 +112,7 @@
             box-shadow: 0 0 80px rgba(255,255,255,0.02);
         }
         .scan-container.success { transform: scale(0.9); filter: blur(20px) brightness(0.3); opacity: 0; transition: all 1s; }
-        #webcam { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); filter: grayscale(1) brightness(0.7); }
+        #webcam { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
 
         /* 结果页布局 */
         .result-grid {
@@ -239,7 +239,8 @@
             <div id="camera-switch-btn" onclick="switchCamera()" style="display:none; position:absolute; top:20px; right:20px; z-index:10; background:rgba(0,0,0,0.5); padding:8px; border-radius:50%; cursor:pointer;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
             </div>
-            <div style="position:absolute; inset:0; background:radial-gradient(circle, transparent 40%, #000 120%); display:flex; align-items:center; justify-content:center; pointer-events:none;">
+            <div style="position:absolute; inset:0; background:radial-gradient(circle, transparent 40%, #000 120%); display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none;">
+                <div id="camera-status" style="font-size:0.6rem; color:red; margin-bottom:10px;"></div>
                 <div style="font-family:var(--font-serif); font-size:0.9rem; letter-spacing:4px; color:rgba(255,255,255,0.6); animation: pulse 2s infinite;">请双手合十</div>
             </div>
         </div>
@@ -312,6 +313,9 @@
         }
 
         async function startCamera(deviceId) {
+            const statusEl = document.getElementById('camera-status');
+            if (statusEl) statusEl.innerText = "";
+
             if (v.srcObject) v.srcObject.getTracks().forEach(t => t.stop());
             const constraints = { 
                 video: deviceId ? { deviceId: { exact: deviceId } } : { facingMode: "user" } 
@@ -319,12 +323,14 @@
             try {
                 const s = await navigator.mediaDevices.getUserMedia(constraints);
                 v.srcObject = s;
+                await v.play(); // 显式调用播放
                 isScanning = true;
                 currentDeviceId = s.getVideoTracks()[0].getSettings().deviceId;
                 requestAnimationFrame(detectionLoop);
             } catch (err) {
                 console.warn("摄像头开启失败:", err);
-                setTimeout(processAnalysis, 3000);
+                if (statusEl) statusEl.innerText = "摄像头启动失败: " + err.message;
+                setTimeout(processAnalysis, 5000); // 延长演示模式等待时间
             }
         }
 
