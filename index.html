@@ -475,15 +475,16 @@
         }
 
         async function generateArt(userBase64, matchDrink, dest, family) {
-            const artPrompt = `High-end Magazine Cover Photography. 
-            SUBJECT: A stylish traveler (replicate person from Image 1 with 100% similarity) elegantly holding the beverage bottle from Image 2. 
+            const artPrompt = `High-end Cinematic Travel Photography. 
+            SUBJECT: A stylish traveler (replicate person from Image 1 with 100% similarity). 
             SCENE: Dramatic landscape of ${dest}. 
-            STYLE: Cinematic professional photography, soft evening light, high fashion aesthetic. One cohesive masterpiece.`;
+            STYLE: Professional travel photography, soft natural lighting, high-fashion color grading. 
+            A pure, soulful and stunning travel portrait masterpiece.`;
 
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [ { text: artPrompt }, { inlineData: { mimeType: "image/jpeg", data: userBase64 } }, { inlineData: { mimeType: "image/jpeg", data: matchDrink.base64 } } ] }], generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } })
+                    body: JSON.stringify({ contents: [{ parts: [ { text: artPrompt }, { inlineData: { mimeType: "image/jpeg", data: userBase64 } } ] }], generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } })
                 });
                 const res = await response.json(); const img = res.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
                 if (img) {
@@ -496,7 +497,7 @@
                 }
                 const reason = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: `Write a poetic travel diary entry in Chinese (40 words) for someone in ${dest} holding ${matchDrink.name}. The theme color is ${family}. Make it romantic and soulful.` }] }] })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: `Write a poetic travel diary entry in Chinese (40 words) for someone in ${dest}. Mention that ${matchDrink.name} is the perfect companion for this mood. The theme color is ${family}. Make it romantic and soulful.` }] }] })
                 }).then(r => r.json()).then(d => d.candidates[0].content.parts[0].text);
                 document.getElementById('rec-reason').innerText = reason;
             } catch (e) { console.log(e); }
