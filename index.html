@@ -256,9 +256,12 @@
             pages[pageId].classList.add('active');
         }
 
-        // 拖拽上传支持
+        // 全局拖拽支持：范围扩大到整个 setup-page
+        const setupPage = document.getElementById('setup-page');
+        
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            pages.setupContainer.addEventListener(eventName, preventDefaults, false);
+            window.addEventListener(eventName, preventDefaults, false);
+            setupPage.addEventListener(eventName, preventDefaults, false);
         });
 
         function preventDefaults(e) {
@@ -267,20 +270,22 @@
         }
 
         ['dragenter', 'dragover'].forEach(eventName => {
-            pages.setupContainer.addEventListener(eventName, () => pages.setupContainer.classList.add('drag-over'), false);
+            setupPage.addEventListener(eventName, () => {
+                pages.setupContainer.classList.add('drag-over');
+            }, false);
         });
 
         ['dragleave', 'drop'].forEach(eventName => {
-            pages.setupContainer.addEventListener(eventName, () => pages.setupContainer.classList.remove('drag-over'), false);
+            setupPage.addEventListener(eventName, () => {
+                pages.setupContainer.classList.remove('drag-over');
+            }, false);
         });
 
-        pages.setupContainer.addEventListener('drop', handleDrop, false);
-
-        function handleDrop(e) {
+        setupPage.addEventListener('drop', (e) => {
             const dt = e.dataTransfer;
             const files = dt.files;
             handleFiles(files);
-        }
+        }, false);
 
         function handleFiles(files) {
             [...files].forEach(file => {
