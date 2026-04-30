@@ -409,11 +409,16 @@
             setTimeout(() => {
                 document.getElementById('flash').style.opacity = "0";
                 if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
-                matchAndGenerate(userBase64, family);
+                runAnalysis(userBase64, family);
             }, 300);
         }
 
-        function matchAndGenerate(userBase64, family) {
+        function runAnalysis(base64, family) {
+            // 在进入结果页前，先清空旧内容
+            document.getElementById('fortune-title').innerText = "感应中...";
+            document.getElementById('drink-name').innerText = "---";
+            document.getElementById('reason').innerText = "正在解读万象之气...";
+            
             let matches = products.filter(p => p.family === family);
             let bestMatch = matches.length > 0 ? matches[0] : products[0];
 
@@ -456,8 +461,17 @@
         }
 
         function reset() {
-            document.getElementById('art-img').style.display = 'none';
+            // 深度重置 UI 状态
+            isAnalyzing = false;
+            const artImg = document.getElementById('art-img');
+            artImg.style.display = 'none';
+            artImg.src = ""; // 彻底清空图像源，防止残影
+            
             document.getElementById('art-loading').style.display = 'block';
+            document.getElementById('fortune-title').innerText = "---";
+            document.getElementById('drink-name').innerText = "---";
+            document.getElementById('reason').innerText = "---";
+            
             showPage('home');
         }
 
