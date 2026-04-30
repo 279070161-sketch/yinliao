@@ -326,15 +326,52 @@
             [...files].forEach(file => {
                 if (file.type.startsWith('image/')) {
                     const id = Date.now() + Math.random();
+                    
+                    // 智能解析文件名
+                    let fullName = file.name.split('.')[0]; // 去掉后缀
+                    let detectedFamily = null;
+                    let cleanName = fullName;
+
+                    const prefixMap = [
+                        { key: "红色", family: "RED" }, { key: "红", family: "RED" },
+                        { key: "绿色", family: "GREEN" }, { key: "绿", family: "GREEN" },
+                        { key: "蓝色", family: "BLUE" }, { key: "蓝", family: "BLUE" },
+                        { key: "黄色", family: "YELLOW" }, { key: "黄", family: "YELLOW" },
+                        { key: "橙色", family: "ORANGE" }, { key: "橙", family: "ORANGE" },
+                        { key: "青色", family: "CYAN" }, { key: "青", family: "CYAN" },
+                        { key: "紫色", family: "PURPLE" }, { key: "紫", family: "PURPLE" },
+                        { key: "粉色", family: "PINK" }, { key: "粉", family: "PINK" },
+                        { key: "白色", family: "WHITE" }, { key: "白", family: "WHITE" },
+                        { key: "黑色", family: "BLACK" }, { key: "黑", family: "BLACK" }
+                    ];
+
+                    for (let item of prefixMap) {
+                        if (fullName.startsWith(item.key)) {
+                            detectedFamily = item.family;
+                            cleanName = fullName.substring(item.key.length);
+                            break;
+                        }
+                    }
+
                     addNewProduct(id);
+                    
+                    // 自动回填名称
+                    document.getElementById(`name-${id}`).value = cleanName;
+                    const p = products.find(x => x.id === id);
+                    p.name = cleanName;
+
                     const reader = new FileReader();
                     reader.onload = (ev) => {
                         const img = document.getElementById(`img-${id}`);
                         img.src = ev.target.result; img.style.display = 'block';
                         document.getElementById(`label-${id}`).style.display = 'none';
-                        const p = products.find(x => x.id === id);
                         p.base64 = ev.target.result.split(',')[1];
-                        extractPrimaryColor(ev.target.result, (hex) => manualSetColor(id, getColorFamily(hex)));
+                        
+                        if (detectedFamily) {
+                            manualSetColor(id, detectedFamily);
+                        } else {
+                            extractPrimaryColor(ev.target.result, (hex) => manualSetColor(id, getColorFamily(hex)));
+                        }
                     };
                     reader.readAsDataURL(file);
                 }
