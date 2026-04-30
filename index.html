@@ -301,14 +301,6 @@
         function handleFiles(files, replaceTargetId = null) {
             [...files].forEach((file, index) => {
                 if (file.type.startsWith('image/')) {
-                    // 如果是“更新”现有卡片（且只选了一张图），则不新增
-                    if (replaceTargetId && files.length === 1) {
-                        readFile(file, replaceTargetId);
-                        return;
-                    }
-
-                    // 否则视为“新增”
-                    const id = Date.now() + Math.random() + index;
                     let fullName = file.name.split('.')[0];
                     let detectedFamily = null;
                     let cleanName = fullName;
@@ -334,6 +326,19 @@
                         }
                     }
 
+                    if (replaceTargetId && files.length === 1) {
+                        // 更新现有卡片名
+                        const nameInput = document.getElementById(`name-${replaceTargetId}`);
+                        if (nameInput && !nameInput.value) { // 仅在名称为空时自动填充
+                            nameInput.value = cleanName;
+                            const p = products.find(x => x.id === replaceTargetId);
+                            if (p) p.name = cleanName;
+                        }
+                        readFile(file, replaceTargetId, detectedFamily);
+                        return;
+                    }
+
+                    const id = Date.now() + Math.random() + index;
                     addNewProduct(id);
                     document.getElementById(`name-${id}`).value = cleanName;
                     const p = products.find(x => x.id === id);
