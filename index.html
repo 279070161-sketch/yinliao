@@ -72,6 +72,13 @@
             width: 100%; max-width: 900px;
             max-height: 85vh; overflow-y: auto;
             backdrop-filter: blur(10px);
+            transition: 0.3s;
+        }
+
+        .setup-container.drag-over {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.4);
+            transform: scale(1.01);
         }
 
         .product-list {
@@ -207,13 +214,14 @@
         </div>
     </div>
 
-    <input type="file" id="hidden-file" style="display:none" accept="image/*">
+    <input type="file" id="hidden-file" style="display:none" accept="image/*" multiple>
     <canvas id="capture-canvas" style="display:none;"></canvas>
 
     <script>
         const apiKey = "AIzaSyBw0YbGjGrh2h2suRsTHNU8jXppFgDQkdk";
         const pages = {
             setup: document.getElementById('setup-page'),
+            setupContainer: document.querySelector('.setup-container'),
             home: document.getElementById('home-page'),
             scan: document.getElementById('scan-page'),
             result: document.getElementById('result-page')
@@ -248,9 +256,65 @@
             pages[pageId].classList.add('active');
         }
 
+        // 拖拽上传支持
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            pages.setupContainer.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            pages.setupContainer.addEventListener(eventName, () => pages.setupContainer.classList.add('drag-over'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            pages.setupContainer.addEventListener(eventName, () => pages.setupContainer.classList.remove('drag-over'), false);
+        });
+
+        pages.setupContainer.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            [...files].forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const newId = Date.now() + Math.random();
+                    addNewProduct(newId);
+                    readFile(file, newId);
+                }
+            });
+        }
+
+        function readFile(file, id) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const base64 = event.target.result.split(',')[1];
+                const img = document.getElementById(`img-${id}`);
+                img.src = event.target.result;
+                img.style.display = 'block';
+                document.getElementById(`label-${id}`).style.display = 'none';
+                
+                const p = products.find(x => x.id === id);
+                p.base64 = base64;
+                
+                extractPrimaryColor(event.target.result, (hex) => {
+                    const family = getColorFamily(hex);
+                    manualSetColor(id, family);
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
         // 产品管理
-        function addNewProduct() {
-            const id = Date.now();
+        function addNewProduct(customId = null) {
+            const id = customId || Date.now();
             const card = document.createElement('div');
             card.className = 'product-card';
             card.id = `card-${id}`;
@@ -261,7 +325,7 @@
 
             card.innerHTML = `
                 <span class="remove-btn" onclick="removeProduct(${id})">✕</span>
-                <div class="preview-circle" onclick="triggerUpload(${id})">
+                <div class="preview-circle" onclick="triggerUploadSingle(${id})">
                     <img id="img-${id}" src="" style="display:none">
                     <span id="label-${id}" style="font-size:0.5rem; opacity:0.2;">上传形象</span>
                 </div>
@@ -273,33 +337,15 @@
             products.push({ id, name: "", base64: "", family: "WHITE" });
         }
 
-        function triggerUpload(id) {
+        function triggerUploadSingle(id) {
             activeFileTarget = id;
+            document.getElementById('hidden-file').onchange = (e) => {
+                if (e.target.files && e.target.files[0]) {
+                    readFile(e.target.files[0], activeFileTarget);
+                }
+            };
             document.getElementById('hidden-file').click();
         }
-
-        document.getElementById('hidden-file').onchange = function(e) {
-            if (e.target.files && e.target.files[0]) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const base64 = event.target.result.split(',')[1];
-                    const img = document.getElementById(`img-${activeFileTarget}`);
-                    img.src = event.target.result;
-                    img.style.display = 'block';
-                    document.getElementById(`label-${activeFileTarget}`).style.display = 'none';
-                    
-                    const p = products.find(x => x.id === activeFileTarget);
-                    p.base64 = base64;
-                    
-                    // 自动建议一个颜色
-                    extractPrimaryColor(event.target.result, (hex) => {
-                        const family = getColorFamily(hex);
-                        manualSetColor(activeFileTarget, family);
-                    });
-                };
-                reader.readAsDataURL(e.target.files[0]);
-            }
-        };
 
         function manualSetColor(id, family) {
             const p = products.find(x => x.id === id);
