@@ -322,13 +322,18 @@
             handleFiles(e.dataTransfer.files);
         });
 
-        function handleFiles(files) {
-            [...files].forEach(file => {
+        function handleFiles(files, replaceTargetId = null) {
+            [...files].forEach((file, index) => {
                 if (file.type.startsWith('image/')) {
-                    const id = Date.now() + Math.random();
-                    
-                    // 智能解析文件名
-                    let fullName = file.name.split('.')[0]; // 去掉后缀
+                    // 如果是“更新”现有卡片（且只选了一张图），则不新增
+                    if (replaceTargetId && files.length === 1) {
+                        readFile(file, replaceTargetId);
+                        return;
+                    }
+
+                    // 否则视为“新增”
+                    const id = Date.now() + Math.random() + index;
+                    let fullName = file.name.split('.')[0];
                     let detectedFamily = null;
                     let cleanName = fullName;
 
@@ -354,28 +359,30 @@
                     }
 
                     addNewProduct(id);
-                    
-                    // 自动回填名称
                     document.getElementById(`name-${id}`).value = cleanName;
                     const p = products.find(x => x.id === id);
                     p.name = cleanName;
-
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                        const img = document.getElementById(`img-${id}`);
-                        img.src = ev.target.result; img.style.display = 'block';
-                        document.getElementById(`label-${id}`).style.display = 'none';
-                        p.base64 = ev.target.result.split(',')[1];
-                        
-                        if (detectedFamily) {
-                            manualSetColor(id, detectedFamily);
-                        } else {
-                            extractPrimaryColor(ev.target.result, (hex) => manualSetColor(id, getColorFamily(hex)));
-                        }
-                    };
-                    reader.readAsDataURL(file);
+                    readFile(file, id, detectedFamily);
                 }
             });
+        }
+
+        function readFile(file, id, forceFamily = null) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = document.getElementById(`img-${id}`);
+                img.src = ev.target.result; img.style.display = 'block';
+                document.getElementById(`label-${id}`).style.display = 'none';
+                const p = products.find(x => x.id === id);
+                p.base64 = ev.target.result.split(',')[1];
+                
+                if (forceFamily) {
+                    manualSetColor(id, forceFamily);
+                } else {
+                    extractPrimaryColor(ev.target.result, (hex) => manualSetColor(id, getColorFamily(hex)));
+                }
+            };
+            reader.readAsDataURL(file);
         }
 
         function addNewProduct(customId = null) {
@@ -383,7 +390,7 @@
             const card = document.createElement('div');
             card.className = 'product-card'; card.id = `card-${id}`;
             let colorsHtml = colorFamilies.map(f => `<div class="color-option" id="color-${id}-${f.name}" style="background:${f.hex}" onclick="manualSetColor(${id}, '${f.name}')"></div>`).join('');
-            card.innerHTML = `<span class="remove-btn" onclick="removeProduct(${id})">✕</span><div class="preview-circle" onclick="activeFileTarget=${id};document.getElementById('hidden-file').onchange=(e)=>handleFiles(e.target.files);document.getElementById('hidden-file').click();"><img id="img-${id}" style="display:none"><span id="label-${id}" style="font-size:0.5rem;opacity:0.2;">上传形象</span></div><input type="text" class="card-input" id="name-${id}" placeholder="产品名称" onchange="products.find(x=>x.id===${id}).name=this.value"><div class="color-picker">${colorsHtml}</div>`;
+            card.innerHTML = `<span class="remove-btn" onclick="removeProduct(${id})">✕</span><div class="preview-circle" onclick="activeFileTarget=${id};document.getElementById('hidden-file').onchange=(e)=>handleFiles(e.target.files, ${id});document.getElementById('hidden-file').click();"><img id="img-${id}" style="display:none"><span id="label-${id}" style="font-size:0.5rem;opacity:0.2;">上传形象</span></div><input type="text" class="card-input" id="name-${id}" placeholder="产品名称" onchange="products.find(x=>x.id===${id}).name=this.value"><div class="color-picker">${colorsHtml}</div>`;
             document.getElementById('product-list').insertBefore(card, document.querySelector('.add-card'));
             products.push({ id, name: "", base64: "", family: "WHITE" });
         }
